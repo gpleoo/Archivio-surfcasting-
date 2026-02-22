@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Archivio Surfcasting</title>
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:         #0d1117;
+      --surface:    #161b22;
+      --surface-2:  #21262d;
+      --surface-3:  #2d333b;
+      --border:     #30363d;
+      --accent:     #58a6ff;
+      --accent-dim: #1f3e6e;
+      --text:       #e6edf3;
+      --text-muted: #8b949e;
+      --success:    #3fb950;
+      --warning:    #d29922;
+      --danger:     #f85149;
+      --radius:     8px;
+      --radius-lg:  12px;
+      --shadow:     0 4px 24px rgba(0,0,0,.5);
+      --transition: .2s ease;
+    }
+    html { font-size: 15px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; outline: none; transition: opacity var(--transition), background var(--transition), transform .1s; }
+    button:active { transform: scale(.97); }
+    input, select, textarea { font-family: inherit; font-size: .9rem; }
+    a { color: var(--accent); text-decoration: none; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(13,17,23,.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: .75rem 1.25rem;
+      display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
+    }
+    .navbar-brand {
+      display: flex; align-items: center; gap: .5rem;
+      font-weight: 700; font-size: 1.1rem; color: var(--text); white-space: nowrap;
+    }
+    .navbar-brand span.logo { font-size: 1.4rem; }
+    .navbar-search {
+      flex: 1; min-width: 180px; max-width: 360px;
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .4rem .75rem;
+    }
+    .navbar-search input {
+      background: transparent; border: none; color: var(--text);
+      width: 100%; outline: none;
+    }
+    .navbar-search input::placeholder { color: var(--text-muted); }
+    .navbar-search .icon { color: var(--text-muted); font-size: .9rem; }
+    .navbar-actions { display: flex; gap: .5rem; margin-left: auto; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: .35rem; padding: .4rem .85rem; border-radius: var(--radius); font-size: .82rem; font-weight: 600; line-height: 1; }
+    .btn-accent { background: var(--accent); color: #000; }
+    .btn-accent:hover { opacity: .85; }
+    .btn-ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--surface-3); }
+    .btn-danger { background: rgba(248,81,73,.15); color: var(--danger); border: 1px solid rgba(248,81,73,.3); }
+    .btn-danger:hover { background: rgba(248,81,73,.25); }
+    .btn-success { background: rgba(63,185,80,.15); color: var(--success); border: 1px solid rgba(63,185,80,.3); }
+    .btn-success:hover { background: rgba(63,185,80,.25); }
+
+    /* ── MAIN ── */
+    .main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+      background: var(--surface-3); border: 1px solid var(--border);
+      color: var(--text); padding: .65rem 1.1rem; border-radius: var(--radius);
+      font-size: .85rem; font-weight: 600; box-shadow: var(--shadow);
+      display: flex; align-items: center; gap: .5rem;
+      transform: translateY(80px); opacity: 0;
+      transition: transform .3s, opacity .3s;
+      pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.toast-success { border-color: var(--success); color: var(--success); }
+    #toast.toast-error   { border-color: var(--danger);  color: var(--danger); }
+
+    /* ── SECTION CARD ── */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    .section-header {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .9rem 1.1rem; cursor: pointer;
+      user-select: none;
+      transition: background var(--transition);
+    }
+    .section-header:hover { background: var(--surface-2); }
+    .section-icon { font-size: 1.3rem; }
+    .section-title { font-size: 1rem; font-weight: 700; flex: 1; }
+    .section-badge {
+      background: var(--surface-3); color: var(--text-muted);
+      font-size: .72rem; font-weight: 700; padding: .15rem .55rem;
+      border-radius: 20px; min-width: 26px; text-align: center;
+    }
+    .section-header-actions { display: flex; align-items: center; gap: .4rem; }
+    .section-header-actions .btn { padding: .3rem .65rem; font-size: .75rem; }
+    .chevron {
+      color: var(--text-muted); font-size: .85rem;
+      transition: transform var(--transition); display: inline-block;
+    }
+    .section-card.open .chevron { transform: rotate(180deg); }
+
+    .section-body {
+      max-height: 0; overflow: hidden;
+      transition: max-height .35s cubic-bezier(.4,0,.2,1);
+    }
+    .section-card.open .section-body { max-height: 9000px; }
+    .section-body-inner { padding: 0 1.1rem 1.1rem; }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    thead { background: var(--surface-2); }
+    th {
+      padding: .6rem .85rem; text-align: left; font-weight: 600;
+      color: var(--text-muted); font-size: .78rem; text-transform: uppercase;
+      letter-spacing: .04em; white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: .6rem .85rem; border-bottom: 1px solid var(--border);
+      vertical-align: middle; word-break: break-word;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface-2); }
+    .td-actions { display: flex; gap: .3rem; justify-content: flex-end; white-space: nowrap; }
+    .td-actions button { background: transparent; padding: .28rem .45rem; border-radius: 6px; font-size: .85rem; color: var(--text-muted); }
+    .td-actions button:hover { background: var(--surface-3); color: var(--text); }
+    .td-actions .btn-del:hover { color: var(--danger); }
+    .empty-row td { text-align: center; color: var(--text-muted); padding: 2rem; font-style: italic; }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,.65); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem; animation: fadeIn .15s;
+    }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow);
+      width: 100%; max-width: 560px; max-height: 90vh;
+      display: flex; flex-direction: column;
+      animation: slideUp .2s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+    }
+    .modal-header h3 { font-size: 1rem; font-weight: 700; }
+    .modal-close {
+      background: transparent; color: var(--text-muted); font-size: 1.2rem;
+      line-height: 1; padding: .2rem .4rem; border-radius: var(--radius);
+    }
+    .modal-close:hover { background: var(--surface-2); color: var(--text); }
+    .modal-body { padding: 1.1rem 1.25rem; overflow-y: auto; flex: 1; }
+    .modal-footer {
+      display: flex; justify-content: flex-end; gap: .5rem;
+      padding: .85rem 1.25rem; border-top: 1px solid var(--border);
+    }
+
+    /* ── FORM ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    .form-group { display: flex; flex-direction: column; gap: .3rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: .78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .5rem .7rem; color: var(--text);
+      transition: border-color var(--transition);
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--accent); outline: none; }
+    .form-group select option { background: var(--surface-2); }
+    .form-group textarea { resize: vertical; min-height: 64px; }
+
+    /* ── FIELDS MODAL ── */
+    .fields-list { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
+    .field-row {
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .5rem .75rem;
+    }
+    .field-row .field-label { flex: 1; font-size: .85rem; }
+    .field-row .field-type { font-size: .75rem; color: var(--text-muted); background: var(--surface-3); padding: .1rem .4rem; border-radius: 4px; }
+    .field-row .field-default { font-size: .7rem; color: var(--text-muted); font-style: italic; }
+    .field-row .btn-del-field { background: transparent; color: var(--text-muted); padding: .2rem .35rem; border-radius: 5px; font-size: .85rem; }
+    .field-row .btn-del-field:hover { background: rgba(248,81,73,.15); color: var(--danger); }
+    .add-field-form {
+      display: grid; grid-template-columns: 1fr auto auto; gap: .5rem;
+      align-items: center; margin-top: .5rem;
+    }
+    .add-field-form input, .add-field-form select {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .45rem .65rem; color: var(--text); font-size: .85rem;
+    }
+    .add-field-form input:focus, .add-field-form select:focus { border-color: var(--accent); outline: none; }
+
+    /* ── CONFIRM INLINE ── */
+    .confirm-row {
+      display: flex; align-items: center; gap: .5rem;
+      background: rgba(248,81,73,.08); border: 1px solid rgba(248,81,73,.25);
+      border-radius: var(--radius); padding: .4rem .7rem; font-size: .82rem;
+    }
+    .confirm-row span { flex: 1; color: var(--danger); font-weight: 600; }
+
+    /* ── COLLAPSE ALL / EXPAND ALL ── */
+    .toolbar { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+    .toolbar-title { font-size: .78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-right: .5rem; }
+
+    /* ── HIGHLIGHT ── */
+    mark { background: rgba(88,166,255,.25); color: var(--text); border-radius: 2px; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .navbar-actions .btn span { display: none; }
+      .section-header { padding: .75rem .85rem; }
+      .section-body-inner { padding: 0 .65rem .85rem; }
+      td, th { padding: .5rem .55rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <span class="logo">🎣</span>
+    Archivio Surfcasting
+  </div>
+  <div class="navbar-search">
+    <span class="icon">🔍</span>
+    <input type="text" id="globalSearch" placeholder="Cerca in tutto l'archivio…" oninput="filterAll()" />
+  </div>
+  <div class="navbar-actions">
+    <button class="btn btn-ghost" onclick="exportData()" title="Esporta JSON">
+      <span>⬇</span><span> Esporta</span>
+    </button>
+    <label class="btn btn-ghost" title="Importa JSON" style="cursor:pointer">
+      <span>⬆</span><span> Importa</span>
+      <input type="file" accept=".json" style="display:none" onchange="importData(event)" />
+    </label>
+    <button class="btn btn-danger" onclick="confirmClearAll()" title="Svuota tutto">
+      <span>🗑</span><span> Reset</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <div class="toolbar">
+    <span class="toolbar-title">Sezioni:</span>
+    <button class="btn btn-ghost" onclick="toggleAll(true)">⊞ Espandi tutto</button>
+    <button class="btn btn-ghost" onclick="toggleAll(false)">⊟ Collassa tutto</button>
+  </div>
+  <div id="sections-container"></div>
+</div>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<!-- ── MODAL ITEM ── -->
+<div id="itemModal" class="modal-backdrop" style="display:none" onclick="closeItemModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="itemModalTitle">Aggiungi elemento</h3>
+      <button class="modal-close" onclick="closeItemModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" id="itemModalForm"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeItemModal()">Annulla</button>
+      <button class="btn btn-accent" onclick="saveItem()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL FIELDS ── -->
+<div id="fieldsModal" class="modal-backdrop" style="display:none" onclick="closeFieldsModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="fieldsModalTitle">Gestione campi</h3>
+      <button class="modal-close" onclick="closeFieldsModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.85rem;">
+        I campi predefiniti non possono essere rimossi. Puoi aggiungere campi custom.
+      </p>
+      <div class="fields-list" id="fieldsModalList"></div>
+      <div class="add-field-form">
+        <input type="text" id="newFieldName" placeholder="Nome nuovo campo…" />
+        <select id="newFieldType">
+          <option value="text">Testo</option>
+          <option value="number">Numero</option>
+          <option value="textarea">Nota lunga</option>
+        </select>
+        <button class="btn btn-accent" onclick="addCustomField()">+ Aggiungi</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeFieldsModal()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  DATA DEFINITIONS
+// ─────────────────────────────────────────────
+const DEFAULTS = [
+  {
+    id: 'travi',
+    name: 'Travi',
+    icon: '🔩',
+    collapsed: false,
+    fields: [
+      { key: 'numero',   label: 'Numero',       type: 'number', required: true,  custom: false },
+      { key: 'misura',   label: 'Misura',        type: 'text',   required: false, custom: false, placeholder: 'es. 3x100' },
+      { key: 'diam_filo',label: 'Ø Filo (mm)',   type: 'text',   required: false, custom: false, placeholder: 'es. 0.35' },
+      { key: 'note',     label: 'Note',          type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'terminali',
+    name: 'Terminali',
+    icon: '🪝',
+    collapsed: false,
+    fields: [
+      { key: 'n_ami',     label: 'N° Ami',           type: 'number', required: true,  custom: false },
+      { key: 'misura_amo',label: 'Misura Amo',        type: 'text',   required: false, custom: false, placeholder: 'es. 2, 1/0' },
+      { key: 'marca_amo', label: 'Marca Amo',         type: 'text',   required: false, custom: false },
+      { key: 'diam_filo', label: 'Ø Filo (mm)',       type: 'text',   required: false, custom: false, placeholder: 'es. 0.30' },
+      { key: 'lung_filo', label: 'Lunghezza Filo (cm)',type: 'number', required: false, custom: false },
+      { key: 'note',      label: 'Note',              type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'piombi',
+    name: 'Piombi',
+    icon: '⚓',
+    collapsed: true,
+    fields: [
+      { key: 'tipo',      label: 'Tipo',        type: 'text',   required: true,  custom: false, placeholder: 'es. Arpa, Fisso, Scorrevole' },
+      { key: 'peso',      label: 'Peso (g)',     type: 'number', required: false, custom: false },
+      { key: 'quantita',  label: 'Quantità',     type: 'number', required: false, custom: false },
+      { key: 'note',      label: 'Note',         type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'fili',
+    name: 'Fili',
+    icon: '🧵',
+    collapsed: true,
+    fields: [
+      { key: 'marca',     label: 'Marca',        type: 'text',   required: true,  custom: false },
+      { key: 'tipo',      label: 'Tipo',         type: 'text',   required: false, custom: false, placeholder: 'Mono / Treccia / Fluoro' },
+      { key: 'diam',      label: 'Ø (mm)',        type: 'text',   required: false, custom: false },
+      { key: 'lunghezza', label: 'Lunghezza (m)', type: 'number', required: false, custom: false },
+      { key: 'colore',    label: 'Colore',        type: 'text',   required: false, custom: false },
+      { key: 'note',      label: 'Note',          type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'shock',
+    name: 'Shock Leader',
+    icon: '💪',
+    collapsed: true,
+    fields: [
+      { key: 'marca',     label: 'Marca',        type: 'text',   required: true,  custom: false },
+      { key: 'materiale', label: 'Materiale',    type: 'text',   required: false, custom: false, placeholder: 'Nylon / Fluoro' },
+      { key: 'diam',      label: 'Ø (mm)',        type: 'text',   required: false, custom: false },
+      { key: 'lunghezza', label: 'Lunghezza (m)', type: 'number', required: false, custom: false },
+      { key: 'note',      label: 'Note',          type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'mulinelli',
+    name: 'Mulinelli',
+    icon: '🎛️',
+    collapsed: true,
+    fields: [
+      { key: 'marca',     label: 'Marca',           type: 'text',   required: true,  custom: false },
+      { key: 'modello',   label: 'Modello',         type: 'text',   required: false, custom: false },
+      { key: 'rapporto',  label: 'Rapporto',        type: 'text',   required: false, custom: false, placeholder: 'es. 5.2:1' },
+      { key: 'capacita',  label: 'Capacità filo',   type: 'text',   required: false, custom: false, placeholder: 'es. 200m 0.30' },
+      { key: 'stato',     label: 'Stato',           type: 'text',   required: false, custom: false, placeholder: 'Ottimo / Buono / Da revisionare' },
+      { key: 'note',      label: 'Note',            type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'canne',
+    name: 'Canne',
+    icon: '🎣',
+    collapsed: true,
+    fields: [
+      { key: 'marca',     label: 'Marca',           type: 'text',   required: true,  custom: false },
+      { key: 'modello',   label: 'Modello',         type: 'text',   required: false, custom: false },
+      { key: 'lunghezza', label: 'Lunghezza (m)',    type: 'text',   required: false, custom: false, placeholder: 'es. 4.20' },
+      { key: 'potenza',   label: 'Potenza (g)',      type: 'text',   required: false, custom: false, placeholder: 'es. 40-150' },
+      { key: 'stato',     label: 'Stato',           type: 'text',   required: false, custom: false, placeholder: 'Ottimo / Buono / Da riparare' },
+      { key: 'note',      label: 'Note',            type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'ami',
+    name: 'Ami',
+    icon: '🪝',
+    collapsed: true,
+    fields: [
+      { key: 'marca',     label: 'Marca',    type: 'text',   required: true,  custom: false },
+      { key: 'misura',    label: 'Misura',   type: 'text',   required: false, custom: false, placeholder: 'es. 2, 1/0, 4/0' },
+      { key: 'tipo',      label: 'Tipo',     type: 'text',   required: false, custom: false, placeholder: 'es. Limerick, Aberdeen' },
+      { key: 'quantita',  label: 'Quantità', type: 'number', required: false, custom: false },
+      { key: 'note',      label: 'Note',     type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'accessori',
+    name: 'Accessori',
+    icon: '🧰',
+    collapsed: true,
+    fields: [
+      { key: 'nome',      label: 'Nome',       type: 'text',   required: true,  custom: false },
+      { key: 'desc',      label: 'Descrizione',type: 'text',   required: false, custom: false },
+      { key: 'quantita',  label: 'Quantità',   type: 'number', required: false, custom: false },
+      { key: 'note',      label: 'Note',       type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+];
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let state = { sections: [] };
+let _editSectionId  = null;
+let _editItemId     = null;
+let _fieldsSectionId = null;
+let _searchQuery    = '';
+
+// ─────────────────────────────────────────────
+//  PERSISTENCE
+// ─────────────────────────────────────────────
+function loadData() {
+  try {
+    const raw = localStorage.getItem('surfcasting_data');
+    if (raw) {
+      const saved = JSON.parse(raw);
+      // Merge: add any new default sections not yet in saved
+      const ids = saved.sections.map(s => s.id);
+      DEFAULTS.forEach(def => {
+        if (!ids.includes(def.id)) saved.sections.push(JSON.parse(JSON.stringify(def)));
+      });
+      state = saved;
+    } else {
+      state = { sections: JSON.parse(JSON.stringify(DEFAULTS)) };
+    }
+  } catch(e) {
+    state = { sections: JSON.parse(JSON.stringify(DEFAULTS)) };
+  }
+}
+
+function saveData() {
+  try {
+    localStorage.setItem('surfcasting_data', JSON.stringify(state));
+    showToast('Salvato ✓', 'success');
+  } catch(e) {
+    showToast('Errore nel salvataggio!', 'error');
+  }
+}
+
+// ─────────────────────────────────────────────
+//  EXPORT / IMPORT
+// ─────────────────────────────────────────────
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `archivio-surfcasting-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Esportazione completata', 'success');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.sections || !Array.isArray(imported.sections))
+        throw new Error('Formato non valido');
+      state = imported;
+      saveData();
+      renderAll();
+      showToast('Importazione completata ✓', 'success');
+    } catch(err) {
+      showToast('File JSON non valido!', 'error');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function confirmClearAll() {
+  if (confirm('Sei sicuro di voler eliminare TUTTI i dati? Questa azione non è reversibile.')) {
+    state = { sections: JSON.parse(JSON.stringify(DEFAULTS)) };
+    saveData();
+    renderAll();
+    showToast('Archivio svuotato', 'success');
+  }
+}
+
+// ─────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────
+function renderAll() {
+  const container = document.getElementById('sections-container');
+  container.innerHTML = '';
+  state.sections.forEach(s => container.appendChild(renderSection(s)));
+}
+
+function renderSection(s) {
+  const q = _searchQuery.toLowerCase();
+  const filteredItems = q
+    ? s.items.filter(item =>
+        Object.values(item).some(v => String(v).toLowerCase().includes(q))
+      )
+    : s.items;
+
+  const card = document.createElement('div');
+  card.className = 'section-card' + (s.collapsed ? '' : ' open');
+  card.dataset.id = s.id;
+
+  // Header
+  const hdr = document.createElement('div');
+  hdr.className = 'section-header';
+  hdr.onclick = () => toggleSection(s.id);
+  hdr.innerHTML = `
+    <span class="section-icon">${s.icon}</span>
+    <span class="section-title">${esc(s.name)}</span>
+    <span class="section-badge">${filteredItems.length}${q && filteredItems.length !== s.items.length ? '/'+s.items.length : ''}</span>
+    <div class="section-header-actions" onclick="event.stopPropagation()">
+      <button class="btn btn-ghost" onclick="openItemModal('${s.id}')" title="Aggiungi elemento">+ Aggiungi</button>
+      <button class="btn btn-ghost" onclick="openFieldsModal('${s.id}')" title="Gestisci campi">⚙ Campi</button>
+    </div>
+    <span class="chevron">▼</span>
+  `;
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'section-body';
+
+  const inner = document.createElement('div');
+  inner.className = 'section-body-inner';
+
+  // Table
+  const visibleFields = s.fields.filter(f => f.key !== 'note');
+  const wrap = document.createElement('div');
+  wrap.className = 'table-wrap';
+
+  let thead = `<thead><tr>`;
+  visibleFields.forEach(f => { thead += `<th>${esc(f.label)}</th>`; });
+  thead += `<th>Note</th><th style="width:80px"></th></tr></thead>`;
+
+  let tbody = `<tbody>`;
+  if (filteredItems.length === 0) {
+    tbody += `<tr class="empty-row"><td colspan="${visibleFields.length + 2}">Nessun elemento. Usa "+ Aggiungi" per iniziare.</td></tr>`;
+  } else {
+    filteredItems.forEach(item => {
+      tbody += `<tr>`;
+      visibleFields.forEach(f => {
+        const val = item[f.key] !== undefined ? String(item[f.key]) : '—';
+        tbody += `<td>${highlight(esc(val), q)}</td>`;
+      });
+      // Note column
+      const noteField = s.fields.find(f => f.key === 'note');
+      const noteVal = noteField ? (item['note'] || '—') : '—';
+      tbody += `<td style="max-width:200px;color:var(--text-muted);font-size:.8rem">${highlight(esc(noteVal), q)}</td>`;
+      tbody += `<td><div class="td-actions">
+        <button title="Modifica" onclick="openItemModal('${s.id}','${item.id}')">✏️</button>
+        <button title="Elimina" class="btn-del" onclick="deleteItem('${s.id}','${item.id}')">🗑️</button>
+      </div></td>`;
+      tbody += `</tr>`;
+    });
+  }
+  tbody += `</tbody>`;
+
+  wrap.innerHTML = `<table>${thead}${tbody}</table>`;
+  inner.appendChild(wrap);
+  body.appendChild(inner);
+
+  card.appendChild(hdr);
+  card.appendChild(body);
+  return card;
+}
+
+function highlight(text, q) {
+  if (!q || text === '—') return text;
+  const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─────────────────────────────────────────────
+//  COLLAPSE / EXPAND
+// ─────────────────────────────────────────────
+function toggleSection(id) {
+  const s = getSection(id);
+  s.collapsed = !s.collapsed;
+  // Update DOM without full re-render for perf
+  const card = document.querySelector(`.section-card[data-id="${id}"]`);
+  if (card) {
+    if (s.collapsed) card.classList.remove('open');
+    else card.classList.add('open');
+  }
+}
+
+function toggleAll(expand) {
+  state.sections.forEach(s => { s.collapsed = !expand; });
+  document.querySelectorAll('.section-card').forEach(card => {
+    if (expand) card.classList.add('open');
+    else card.classList.remove('open');
+  });
+}
+
+// ─────────────────────────────────────────────
+//  ITEM MODAL
+// ─────────────────────────────────────────────
+function openItemModal(sectionId, itemId = null) {
+  _editSectionId = sectionId;
+  _editItemId    = itemId;
+  const s    = getSection(sectionId);
+  const item = itemId ? s.items.find(i => i.id === itemId) : null;
+
+  document.getElementById('itemModalTitle').textContent =
+    item ? `Modifica — ${s.name}` : `Aggiungi — ${s.name}`;
+
+  const form = document.getElementById('itemModalForm');
+  form.innerHTML = '';
+
+  s.fields.forEach(f => {
+    const val  = item ? (item[f.key] ?? '') : '';
+    const full = f.type === 'textarea' ? ' full' : '';
+    const ph   = f.placeholder ? `placeholder="${esc(f.placeholder)}"` : '';
+    let input;
+    if (f.type === 'textarea') {
+      input = `<textarea id="field_${f.key}" rows="3" ${ph}>${esc(val)}</textarea>`;
+    } else {
+      input = `<input type="${f.type === 'number' ? 'number' : 'text'}" id="field_${f.key}" value="${esc(val)}" ${ph} />`;
+    }
+    form.insertAdjacentHTML('beforeend', `
+      <div class="form-group${full}">
+        <label for="field_${f.key}">${esc(f.label)}${f.required ? ' *' : ''}</label>
+        ${input}
+      </div>
+    `);
+  });
+
+  document.getElementById('itemModal').style.display = 'flex';
+  // Focus first input
+  const first = form.querySelector('input, select, textarea');
+  if (first) setTimeout(() => first.focus(), 100);
+}
+
+function closeItemModal(event) {
+  if (event && event.target !== document.getElementById('itemModal')) return;
+  document.getElementById('itemModal').style.display = 'none';
+  _editSectionId = _editItemId = null;
+}
+
+function saveItem() {
+  const s = getSection(_editSectionId);
+  const item = _editItemId ? s.items.find(i => i.id === _editItemId) : { id: uid() };
+
+  let valid = true;
+  s.fields.forEach(f => {
+    const el = document.getElementById('field_' + f.key);
+    if (!el) return;
+    const val = el.value.trim();
+    if (f.required && !val) {
+      el.style.borderColor = 'var(--danger)';
+      valid = false;
+    } else {
+      el.style.borderColor = '';
+      item[f.key] = f.type === 'number' ? (val === '' ? '' : Number(val)) : val;
+    }
+  });
+  if (!valid) { showToast('Compila i campi obbligatori (*)', 'error'); return; }
+
+  if (!_editItemId) s.items.push(item);
+
+  saveData();
+  document.getElementById('itemModal').style.display = 'none';
+  rerenderSection(s.id);
+}
+
+// ─────────────────────────────────────────────
+//  DELETE ITEM
+// ─────────────────────────────────────────────
+function deleteItem(sectionId, itemId) {
+  if (!confirm('Eliminare questo elemento?')) return;
+  const s = getSection(sectionId);
+  s.items = s.items.filter(i => i.id !== itemId);
+  saveData();
+  rerenderSection(s.id);
+}
+
+// ─────────────────────────────────────────────
+//  FIELDS MODAL
+// ─────────────────────────────────────────────
+function openFieldsModal(sectionId) {
+  _fieldsSectionId = sectionId;
+  const s = getSection(sectionId);
+  document.getElementById('fieldsModalTitle').textContent = `Campi — ${s.name}`;
+  renderFieldsList(s);
+  document.getElementById('newFieldName').value = '';
+  document.getElementById('fieldsModal').style.display = 'flex';
+}
+
+function renderFieldsList(s) {
+  const list = document.getElementById('fieldsModalList');
+  list.innerHTML = '';
+  s.fields.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'field-row';
+    row.innerHTML = `
+      <span class="field-label">${esc(f.label)}</span>
+      <span class="field-type">${f.type}</span>
+      ${f.custom ? '' : '<span class="field-default">predefinito</span>'}
+      ${f.custom
+        ? `<button class="btn-del-field" onclick="removeCustomField('${f.key}')" title="Rimuovi campo">✕</button>`
+        : ''}
+    `;
+    list.appendChild(row);
+  });
+}
+
+function addCustomField() {
+  const nameEl = document.getElementById('newFieldName');
+  const typeEl = document.getElementById('newFieldType');
+  const name   = nameEl.value.trim();
+  const type   = typeEl.value;
+  if (!name) { nameEl.focus(); return; }
+
+  const s   = getSection(_fieldsSectionId);
+  const key = 'custom_' + name.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'') + '_' + Date.now();
+
+  s.fields.push({ key, label: name, type, required: false, custom: true });
+  nameEl.value = '';
+  saveData();
+  renderFieldsList(s);
+  rerenderSection(s.id);
+}
+
+function removeCustomField(key) {
+  const s = getSection(_fieldsSectionId);
+  if (!confirm('Rimuovere il campo? I dati in questo campo verranno persi.')) return;
+  s.fields = s.fields.filter(f => f.key !== key);
+  s.items.forEach(item => delete item[key]);
+  saveData();
+  renderFieldsList(s);
+  rerenderSection(s.id);
+}
+
+function closeFieldsModal(event) {
+  if (event && event.target !== document.getElementById('fieldsModal')) return;
+  document.getElementById('fieldsModal').style.display = 'none';
+  _fieldsSectionId = null;
+}
+
+// ─────────────────────────────────────────────
+//  SEARCH
+// ─────────────────────────────────────────────
+function filterAll() {
+  _searchQuery = document.getElementById('globalSearch').value.trim();
+  // Expand all sections if searching
+  if (_searchQuery) {
+    state.sections.forEach(s => { s.collapsed = false; });
+  }
+  renderAll();
+}
+
+// ─────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────
+function getSection(id) { return state.sections.find(s => s.id === id); }
+
+function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+function rerenderSection(id) {
+  const s   = getSection(id);
+  const old = document.querySelector(`.section-card[data-id="${id}"]`);
+  if (!old) { renderAll(); return; }
+  const fresh = renderSection(s);
+  old.parentNode.replaceChild(fresh, old);
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show toast-' + type;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = ''; }, 2500);
+}
+
+// ─────────────────────────────────────────────
+//  KEYBOARD SHORTCUTS
+// ─────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('itemModal').style.display   = 'none';
+    document.getElementById('fieldsModal').style.display = 'none';
+  }
+  // Ctrl/Cmd + F → focus search
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+    e.preventDefault();
+    document.getElementById('globalSearch').focus();
+  }
+  // Ctrl/Cmd + S → save (no-op: auto save, but feedback)
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    saveData();
+  }
+  // Enter in item modal form
+  if (e.key === 'Enter' && document.getElementById('itemModal').style.display !== 'none') {
+    const active = document.activeElement;
+    if (active && active.tagName !== 'TEXTAREA') saveItem();
+  }
+});
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+loadData();
+renderAll();
+</script>
+</body>
+</html>
