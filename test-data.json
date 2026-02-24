@@ -1,0 +1,205 @@
+{
+  "sections": [
+    {
+      "id": "travi", "name": "Travi", "icon": "🔩", "collapsed": false,
+      "fields": [
+        { "key": "numero",    "label": "Numero",      "type": "number",   "required": true,  "custom": false },
+        { "key": "misura",    "label": "Misura",      "type": "text",     "required": false, "custom": false, "placeholder": "es. 3x100" },
+        { "key": "diam_filo", "label": "Ø Filo (mm)", "type": "text",     "required": false, "custom": false, "placeholder": "es. 0.35" },
+        { "key": "note",      "label": "Note",        "type": "textarea", "required": false, "custom": false }
+      ],
+      "items": [
+        { "id": "t1a2b3c4d5e6", "numero": 3, "misura": "3x100", "diam_filo": "0.35", "note": "Trabucco, ottima tenuta" },
+        { "id": "t7f8g9h0i1j2", "numero": 2, "misura": "2x80",  "diam_filo": "0.30", "note": "Colmic, usati raramente" },
+        { "id": "tk3l4m5n6o7p", "numero": 5, "misura": "3x120", "diam_filo": "0.40", "note": "Maver, rinforzati" },
+        { "id": "tq8r9s0t1u2v", "numero": 1, "misura": "2x60",  "diam_filo": "0.28", "note": "Da testare in gara" },
+        { "id": "tw3x4y5z6a7b", "numero": 4, "misura": "4x150", "diam_filo": "0.50", "note": "Tubertini, per fondali sabbiosi" },
+        { "id": "tc8d9e0f1g2h", "numero": 2, "misura": "3x90",  "diam_filo": "0.35", "note": "Trabucco Excellence" },
+        { "id": "ti3j4k5l6m7n", "numero": 6, "misura": "2x100", "diam_filo": "0.32", "note": "Scorte invernali" }
+      ]
+    },
+    {
+      "id": "terminali", "name": "Terminali", "icon": "🪝", "collapsed": false,
+      "fields": [
+        { "key": "n_ami",      "label": "N° Ami",             "type": "number",   "required": true,  "custom": false },
+        { "key": "misura_amo", "label": "Misura Amo",         "type": "text",     "required": false, "custom": false, "placeholder": "es. 2, 1/0" },
+        { "key": "marca_amo",  "label": "Marca Amo",          "type": "text",     "required": false, "custom": false },
+        { "key": "diam_filo",  "label": "Ø Filo (mm)",        "type": "text",     "required": false, "custom": false, "placeholder": "es. 0.30" },
+        { "key": "lung_filo",  "label": "Lunghezza Filo (cm)","type": "number",   "required": false, "custom": false },
+        { "key": "note",       "label": "Note",               "type": "textarea", "required": false, "custom": false }
+      ],
+      "items": [
+        { "id": "mo1a2b3c4d5e", "n_ami": 2, "misura_amo": "2",   "marca_amo": "Gamakatsu", "diam_filo": "0.30", "lung_filo": 80,  "note": "Montato con girella e perline" },
+        { "id": "mo6f7g8h9i0j", "n_ami": 1, "misura_amo": "1/0", "marca_amo": "Owner",     "diam_filo": "0.35", "lung_filo": 100, "note": "Per orate grosse" },
+        { "id": "mok1l2m3n4o5", "n_ami": 3, "misura_amo": "4",   "marca_amo": "Mustad",    "diam_filo": "0.25", "lung_filo": 60,  "note": "Terminale da surf, paternoster" },
+        { "id": "mop6q7r8s9t0", "n_ami": 2, "misura_amo": "2/0", "marca_amo": "Gamakatsu", "diam_filo": "0.40", "lung_filo": 120, "note": "Bracci da 15 cm ciascuno" },
+        { "id": "mou1v2w3x4y5", "n_ami": 1, "misura_amo": "6",   "marca_amo": "Owner",     "diam_filo": "0.22", "lung_filo": 50,  "note": "Per piccoli target" },
+        { "id": "moz6a7b8c9d0", "n_ami": 2, "misura_amo": "1",   "marca_amo": "Tubertini", "diam_filo": "0.28", "lung_filo": 90,  "note": "Con girella antirotazione" },
+        { "id": "moe1f2g3h4i5", "n_ami": 3, "misura_amo": "3/0", "marca_amo": "Mustad",    "diam_filo": "0.45", "lung_filo": 110, "note": "Per spigola di mezzanotte" },
+        { "id": "moj6k7l8m9n0", "n_ami": 1, "misura_amo": "8",   "marca_amo": "Gamakatsu", "diam_filo": "0.20", "lung_filo": 40,  "note": "Finissimo, acque limpide" }
+      ]
+    },
+    {
+      "id": "piombi", "name": "Piombi", "icon": "⚓", "collapsed": true,
+      "fields": [
+        { "key": "tipo",     "label": "Tipo",     "type": "text",     "required": true,  "custom": false, "placeholder": "es. Arpa, Fisso, Scorrevole" },
+        { "key": "peso",     "label": "Peso (g)", "type": "number",   "required": false, "custom": false },
+        { "key": "quantita", "label": "Quantità", "type": "number",   "required": false, "custom": false },
+        { "key": "note",     "label": "Note",     "type": "textarea", "required": false, "custom": false }
+      ],
+      "items": [
+        { "id": "pl1a2b3c4d5e", "tipo": "Arpa",         "peso": 100, "quantita": 5,  "note": "Per fondali sabbiosi" },
+        { "id": "pl6f7g8h9i0j", "tipo": "Fisso",        "peso": 80,  "quantita": 8,  "note": "Trabucco, ottima tenuta" },
+        { "id": "plk1l2m3n4o5", "tipo": "Scorrevole",   "peso": 120, "quantita": 4,  "note": "Per pesca a bolentino da riva" },
+        { "id": "plp6q7r8s9t0", "tipo": "Bombarda",     "peso": 60,  "quantita": 6,  "note": "Usati con terminali lunghi" },
+        { "id": "plu1v2w3x4y5", "tipo": "Pera",         "peso": 150, "quantita": 3,  "note": "Da acquistarne altri" },
+        { "id": "plz6a7b8c9d0", "tipo": "Arpa",         "peso": 200, "quantita": 2,  "note": "Da grosso, vento forte" },
+        { "id": "ple1f2g3h4i5", "tipo": "Fisso",        "peso": 50,  "quantita": 10, "note": "Scorta per gare" },
+        { "id": "plj6k7l8m9n0", "tipo": "Piombo piatto","peso": 90,  "quantita": 4,  "note": "Correnti laterali" },
+        { "id": "plo1p2q3r4s5", "tipo": "Scorrevole",   "peso": 70,  "quantita": 7,  "note": "Con molla antiparassita" }
+      ]
+    },
+    {
+      "id": "fili", "name": "Fili", "icon": "🧵", "collapsed": true,
+      "fields": [
+        { "key": "marca",     "label": "Marca",         "type": "text",     "required": true,  "custom": false },
+        { "key": "tipo",      "label": "Tipo",          "type": "text",     "required": false, "custom": false, "placeholder": "Mono / Treccia / Fluoro" },
+        { "key": "diam",      "label": "Ø (mm)",        "type": "text",     "required": false, "custom": false },
+        { "key": "lunghezza", "label": "Lunghezza (m)", "type": "number",   "required": false, "custom": false },
+        { "key": "colore",    "label": "Colore",        "type": "text",     "required": false, "custom": false },
+        { "key": "note",      "label": "Note",          "type": "textarea", "required": false, "custom": false }
+      ],
+      "items": [
+        { "id": "fi1a2b3c4d5e", "marca": "Trabucco", "tipo": "Mono",    "diam": "0.35", "lunghezza": 300, "colore": "Giallo fluo", "note": "Mulinello principale" },
+        { "id": "fi6f7g8h9i0j", "marca": "Daiwa",    "tipo": "Treccia", "diam": "0.18", "lunghezza": 200, "colore": "Verde",       "note": "Ottima scorrevolezza" },
+        { "id": "fik1l2m3n4o5", "marca": "Shimano",  "tipo": "Treccia", "diam": "0.20", "lunghezza": 300, "colore": "Arancione",   "note": "Kairiki 8, solidissima" },
+        { "id": "fip6q7r8s9t0", "marca": "Penn",     "tipo": "Mono",    "diam": "0.40", "lunghezza": 250, "colore": "Trasparente", "note": "Per shock leader corto" },
+        { "id": "fiu1v2w3x4y5", "marca": "Colmic",   "tipo": "Fluoro",  "diam": "0.28", "lunghezza": 100, "colore": "Incolore",    "note": "Terminali in fluoro" },
+        { "id": "fiz6a7b8c9d0", "marca": "Maver",    "tipo": "Mono",    "diam": "0.30", "lunghezza": 150, "colore": "Azzurro",     "note": "Bassa visibilità sott'acqua" },
+        { "id": "fie1f2g3h4i5", "marca": "Trabucco", "tipo": "Treccia", "diam": "0.16", "lunghezza": 400, "colore": "Multicolor",  "note": "T-Force surf casting" }
+      ]
+    },
+    {
+      "id": "shock", "name": "Shock Leader", "icon": "💪", "collapsed": true,
+      "fields": [
+        { "key": "marca",     "label": "Marca",         "type": "text",     "required": true,  "custom": false },
+        { "key": "materiale", "label": "Materiale",     "type": "text",     "required": false, "custom": false, "placeholder": "Nylon / Fluoro" },
+        { "key": "diam",      "label": "Ø (mm)",        "type": "text",     "required": false, "custom": false },
+        { "key": "lunghezza", "label": "Lunghezza (m)", "type": "number",   "required": false, "custom": false },
+        { "key": "note",      "label": "Note",          "type": "textarea", "required": false, "custom": false }
+      ],
+      "items": [
+        { "id": "sh1a2b3c4d5e", "marca": "Trabucco",  "materiale": "Nylon",  "diam": "0.60", "lunghezza": 15, "note": "Resistenza 30 lb" },
+        { "id": "sh6f7g8h9i0j", "marca": "Colmic",    "materiale": "Fluoro", "diam": "0.55", "lunghezza": 12, "note": "Invisibile in acqua" },
+        { "id": "shk1l2m3n4o5", "marca": "Penn",      "materiale": "Nylon",  "diam": "0.70", "lunghezza": 18, "note": "Per piombi pesanti 150g+" },
+        { "id": "shp6q7r8s9t0", "marca": "Shimano",   "materiale": "Fluoro", "diam": "0.50", "lunghezza": 10, "note": "Acque limpide, alta visibilità" },
+        { "id": "shu1v2w3x4y5", "marca": "Tubertini", "materiale": "Nylon",  "diam": "0.65", "lunghezza": 20, "note": "Ottima resistenza all'abrasione" },
+        { "id": "shz6a7b8c9d0", "marca": "Maver",     "materiale": "Nylon",  "diam": "0.58", "lunghezza": 14, "note": "Per distanze medie" }
+      ]
+    },
+    {
+      "id": "mulinelli", "name": "Mulinelli", "icon": "🎛️", "collapsed": true,
+      "fields": [
+        { "key": "marca",    "label": "Marca",         "type": "text",     "required": true,  "custom": false },
+        { "key": "modello",  "label": "Modello",       "type": "text",     "required": false, "custom": false },
+        { "key": "rapporto", "label": "Rapporto",      "type": "text",     "required": false, "custom": false, "placeholder": "es. 5.2:1" },
+        { "key": "capacita", "label": "Capacità filo", "type": "text",     "required": false, "custom": false, "placeholder": "es. 200m 0.30" },
+        { "key": "stato",    "label": "Stato",         "type": "text",     "required": false, "custom": false, "placeholder": "Ottimo / Buono / Da revisionare" },
+        { "key": "note",     "label": "Note",          "type": "textarea", "required": false, "custom": false }
+      ],
+      "items": [
+        { "id": "mu1a2b3c4d5e", "marca": "Shimano",  "modello": "Ultegra 14000 XTD",  "rapporto": "4.4:1", "capacita": "300m / 0.35", "stato": "Ottimo",         "note": "Mulinello da gara, frizione posteriore" },
+        { "id": "mu6f7g8h9i0j", "marca": "Daiwa",    "modello": "Tournament ISO 4000","rapporto": "5.0:1", "capacita": "200m / 0.30", "stato": "Buono",          "note": "Leggero, usato in coppa" },
+        { "id": "muk1l2m3n4o5", "marca": "Penn",     "modello": "Battle III 5000",    "rapporto": "6.2:1", "capacita": "250m / 0.30", "stato": "Da revisionare", "note": "Frizione da lubrificare" },
+        { "id": "mup6q7r8s9t0", "marca": "Shimano",  "modello": "Baitrunner DL 6000", "rapporto": "5.5:1", "capacita": "350m / 0.40", "stato": "Ottimo",         "note": "Frizione doppia, ideale surf" },
+        { "id": "muu1v2w3x4y5", "marca": "Daiwa",    "modello": "Emcast 5500A",       "rapporto": "4.8:1", "capacita": "280m / 0.35", "stato": "Buono",          "note": "Surf specialistico" },
+        { "id": "muz6a7b8c9d0", "marca": "Penn",     "modello": "Surfblaster III 8000","rapporto":"5.1:1", "capacita": "400m / 0.45", "stato": "Ottimo",         "note": "Per lanci lunghi" },
+        { "id": "mue1f2g3h4i5", "marca": "Trabucco", "modello": "Ultraspin 6000",     "rapporto": "5.2:1", "capacita": "300m / 0.35", "stato": "Buono",          "note": "Rapporto equilibrato" }
+      ]
+    },
+    {
+      "id": "canne", "name": "Canne", "icon": "🎣", "collapsed": true,
+      "fields": [
+        { "key": "marca",     "label": "Marca",         "type": "text",     "required": true,  "custom": false },
+        { "key": "modello",   "label": "Modello",       "type": "text",     "required": false, "custom": false },
+        { "key": "lunghezza", "label": "Lunghezza (m)", "type": "text",     "required": false, "custom": false, "placeholder": "es. 4.20" },
+        { "key": "potenza",   "label": "Potenza (g)",   "type": "text",     "required": false, "custom": false, "placeholder": "es. 40-150" },
+        { "key": "stato",     "label": "Stato",         "type": "text",     "required": false, "custom": false, "placeholder": "Ottimo / Buono / Da riparare" },
+        { "key": "note",      "label": "Note",          "type": "textarea", "required": false, "custom": false }
+      ],
+      "items": [
+        { "id": "ca1a2b3c4d5e", "marca": "Trabucco",  "modello": "Xciter Surf 40",       "lunghezza": "4.20", "potenza": "40-150",  "stato": "Ottimo",      "note": "Canna principale, 3 sezioni" },
+        { "id": "ca6f7g8h9i0j", "marca": "Daiwa",     "modello": "Ballistic X 4.5m",     "lunghezza": "4.50", "potenza": "60-200",  "stato": "Ottimo",      "note": "Azione parabolica" },
+        { "id": "cak1l2m3n4o5", "marca": "Shimano",   "modello": "Nexave Surf 425",       "lunghezza": "4.25", "potenza": "50-180",  "stato": "Buono",       "note": "Punta sensibile" },
+        { "id": "cap6q7r8s9t0", "marca": "Penn",      "modello": "Battalion Surf 4.2",    "lunghezza": "4.20", "potenza": "80-200",  "stato": "Da riparare", "note": "Anello cima da sostituire" },
+        { "id": "cau1v2w3x4y5", "marca": "Maver",     "modello": "Silver Stream 420",     "lunghezza": "4.20", "potenza": "40-120",  "stato": "Buono",       "note": "Leggera, per bassa azione" },
+        { "id": "caz6a7b8c9d0", "marca": "Colmic",    "modello": "Typhoon 450 Pro",       "lunghezza": "4.50", "potenza": "100-250", "stato": "Ottimo",      "note": "Lanci oltre 100m" },
+        { "id": "cae1f2g3h4i5", "marca": "Tubertini", "modello": "Oceanic XR 4.0",        "lunghezza": "4.00", "potenza": "50-150",  "stato": "Buono",       "note": "Manico ergonomico comfort" },
+        { "id": "caj6k7l8m9n0", "marca": "Trabucco",  "modello": "Inspiration Surf 420",  "lunghezza": "4.20", "potenza": "60-180",  "stato": "Ottimo",      "note": "Blank in carbonio 40T" }
+      ]
+    },
+    {
+      "id": "ami", "name": "Ami", "icon": "🪝", "collapsed": true,
+      "fields": [
+        { "key": "marca",    "label": "Marca",    "type": "text",     "required": true,  "custom": false },
+        { "key": "misura",   "label": "Misura",   "type": "text",     "required": false, "custom": false, "placeholder": "es. 2, 1/0, 4/0" },
+        { "key": "tipo",     "label": "Tipo",     "type": "text",     "required": false, "custom": false, "placeholder": "es. Limerick, Aberdeen" },
+        { "key": "quantita", "label": "Quantità", "type": "number",   "required": false, "custom": false },
+        { "key": "note",     "label": "Note",     "type": "textarea", "required": false, "custom": false }
+      ],
+      "items": [
+        { "id": "am1a2b3c4d5e", "marca": "Gamakatsu", "misura": "2",   "tipo": "Limerick",       "quantita": 20, "note": "Per orata e triglia" },
+        { "id": "am6f7g8h9i0j", "marca": "Owner",     "misura": "1/0", "tipo": "Aberdeen",       "quantita": 15, "note": "Punta chirurgica" },
+        { "id": "amk1l2m3n4o5", "marca": "Mustad",    "misura": "4",   "tipo": "Kahle",          "quantita": 30, "note": "Ultra point, basso attrito" },
+        { "id": "amp6q7r8s9t0", "marca": "Gamakatsu", "misura": "2/0", "tipo": "Circle",         "quantita": 12, "note": "Ritenuta ottimale" },
+        { "id": "amu1v2w3x4y5", "marca": "Owner",     "misura": "6",   "tipo": "Limerick",       "quantita": 25, "note": "Per piccola pesca, cefalo" },
+        { "id": "amz6a7b8c9d0", "marca": "Mustad",    "misura": "3/0", "tipo": "O'Shaughnessy",  "quantita": 8,  "note": "Robusto per spigola" },
+        { "id": "ame1f2g3h4i5", "marca": "Tubertini", "misura": "4/0", "tipo": "Wide Gap",       "quantita": 10, "note": "Adatti per vermetti di sabbia" },
+        { "id": "amj6k7l8m9n0", "marca": "Gamakatsu", "misura": "8",   "tipo": "Aberdeen",       "quantita": 40, "note": "Gara rapida, mazzancolla" },
+        { "id": "amo1p2q3r4s5", "marca": "Owner",     "misura": "1",   "tipo": "Ringed",         "quantita": 18, "note": "Apertura ad anello stagna" }
+      ]
+    },
+    {
+      "id": "bobbine", "name": "Bobbine", "icon": "🪡", "collapsed": true,
+      "fields": [
+        { "key": "marca",       "label": "Marca",            "type": "text",     "required": true,  "custom": false },
+        { "key": "modello",     "label": "Modello",          "type": "text",     "required": false, "custom": false },
+        { "key": "tipo",        "label": "Tipo",             "type": "text",     "required": false, "custom": false, "placeholder": "es. Porta-filo, Extra, Spare" },
+        { "key": "capacita",    "label": "Capacità (m/mm)",  "type": "text",     "required": false, "custom": false, "placeholder": "es. 300m / 0.30" },
+        { "key": "compatibile", "label": "Compatibile con",  "type": "text",     "required": false, "custom": false, "placeholder": "es. Shimano Ultegra 14000" },
+        { "key": "stato",       "label": "Stato",            "type": "text",     "required": false, "custom": false, "placeholder": "Ottimo / Buono / Da revisionare" },
+        { "key": "note",        "label": "Note",             "type": "textarea", "required": false, "custom": false }
+      ],
+      "items": [
+        { "id": "bo1a2b3c4d5e", "marca": "Shimano",  "modello": "Spare Ultegra XTD",        "tipo": "Spare",      "capacita": "300m / 0.35", "compatibile": "Shimano Ultegra 14000 XTD",  "stato": "Ottimo",         "note": "Caricata con Kairiki 8" },
+        { "id": "bo6f7g8h9i0j", "marca": "Daiwa",    "modello": "Emcast Spare Spool",       "tipo": "Extra",      "capacita": "250m / 0.30", "compatibile": "Daiwa Emcast 5500A",        "stato": "Buono",          "note": "Treccia verde Daiwa J-Braid" },
+        { "id": "bok1l2m3n4o5", "marca": "Penn",     "modello": "Battle III Spare",         "tipo": "Spare",      "capacita": "300m / 0.30", "compatibile": "Penn Battle III 5000",      "stato": "Ottimo",         "note": "Mono trasparente 0.35" },
+        { "id": "bop6q7r8s9t0", "marca": "Shimano",  "modello": "Baitrunner DL Spare",      "tipo": "Porta-filo", "capacita": "400m / 0.40", "compatibile": "Shimano Baitrunner DL 6000","stato": "Buono",          "note": "Mono giallo fluo Trabucco" },
+        { "id": "bou1v2w3x4y5", "marca": "Trabucco", "modello": "Ultraspin 6000 Extra",     "tipo": "Extra",      "capacita": "350m / 0.35", "compatibile": "Trabucco Ultraspin 6000",   "stato": "Ottimo",         "note": "Caricata in officina" },
+        { "id": "boz6a7b8c9d0", "marca": "Penn",     "modello": "Surfblaster Spare",        "tipo": "Spare",      "capacita": "450m / 0.45", "compatibile": "Penn Surfblaster III 8000", "stato": "Buono",          "note": "Per lanci estremi" },
+        { "id": "boe1f2g3h4i5", "marca": "Daiwa",    "modello": "Tournament Spare Spool",   "tipo": "Extra",      "capacita": "200m / 0.28", "compatibile": "Daiwa Tournament ISO 4000", "stato": "Da revisionare", "note": "Asse leggermente deformato" }
+      ]
+    },
+    {
+      "id": "accessori", "name": "Accessori", "icon": "🧰", "collapsed": true,
+      "fields": [
+        { "key": "nome",     "label": "Nome",        "type": "text",     "required": true,  "custom": false },
+        { "key": "desc",     "label": "Descrizione", "type": "text",     "required": false, "custom": false },
+        { "key": "quantita", "label": "Quantità",    "type": "number",   "required": false, "custom": false },
+        { "key": "note",     "label": "Note",        "type": "textarea", "required": false, "custom": false }
+      ],
+      "items": [
+        { "id": "ac1a2b3c4d5e", "nome": "Girelle tripla rotazione", "desc": "Trabucco, misura 10",          "quantita": 15, "note": "Antirotazione certificata" },
+        { "id": "ac6f7g8h9i0j", "nome": "Perline luminose",         "desc": "Rosse e gialle, Colmic",       "quantita": 50, "note": "Per terminali da notte" },
+        { "id": "ack1l2m3n4o5", "nome": "Aghi inschiodatori",       "desc": "Set 3 pezzi, Maver",           "quantita": 3,  "note": "Indispensabili per il verme" },
+        { "id": "acp6q7r8s9t0", "nome": "Portacanna da spiaggia",   "desc": "In acciaio inox, 3 fusti",     "quantita": 2,  "note": "Stabile sulla sabbia umida" },
+        { "id": "acu1v2w3x4y5", "nome": "Forcelle luminose",        "desc": "Cyalume 8h, verde",            "quantita": 20, "note": "Per pesca notturna" },
+        { "id": "acz6a7b8c9d0", "nome": "Moschettoni con girella",  "desc": "Resistenza 40 kg, Mustad",     "quantita": 25, "note": "Aggancio rapido piombo" },
+        { "id": "ace1f2g3h4i5", "nome": "Spugne per esca",          "desc": "Mantengono umidità vermetti",  "quantita": 6,  "note": "Cambiarle ogni stagione" },
+        { "id": "acj6k7l8m9n0", "nome": "Misuratore lunghezza",     "desc": "Flessibile 70 cm, Trabucco",  "quantita": 1,  "note": "Sempre in borsa" },
+        { "id": "aco1p2q3r4s5", "nome": "Forbici da surfcasting",   "desc": "Inox, manico antiscivolo",     "quantita": 2,  "note": "Una di scorta" },
+        { "id": "act6u7v8w9x0", "nome": "Guanto di lancio",         "desc": "Daiwa, taglia L",              "quantita": 1,  "note": "Protezione dito indice" }
+      ]
+    }
+  ]
+}

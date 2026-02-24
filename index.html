@@ -2,8 +2,33 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Archivio Surfcasting</title>
+
+  <!-- SEO & Social -->
+  <meta name="description" content="Gestisci e archivia tutto il tuo materiale da surfcasting: travi, terminali, piombi, fili, canne, mulinelli e molto altro." />
+  <meta name="keywords" content="surfcasting, pesca, archivio, travi, terminali, piombi, mulinelli, canne" />
+  <meta name="author" content="Archivio Surfcasting" />
+
+  <!-- PWA / Store -->
+  <meta name="theme-color" content="#5ba4f5" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Surfcasting" />
+  <meta name="application-name" content="Archivio Surfcasting" />
+  <meta name="msapplication-TileColor" content="#0b0f14" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Archivio Surfcasting" />
+  <meta property="og:description" content="L'app per archiviare tutto il tuo equipaggiamento da surfcasting." />
+  <meta property="og:type" content="website" />
+
+  <!-- Manifest & Icons -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -281,49 +306,9 @@
     ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-    /* ── SETTINGS PANEL ── */
-    .settings-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      margin-bottom: 1.25rem;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      transition: border-color var(--transition);
-    }
-    .settings-card:hover { border-color: var(--border-light); }
-    .settings-header {
-      display: flex; align-items: center; gap: .85rem;
-      padding: 1rem 1.25rem; cursor: pointer;
-      user-select: none;
-      transition: background var(--transition);
-    }
-    .settings-header:hover { background: var(--surface-2); }
-    .settings-icon { font-size: 1.3rem; }
-    .settings-title { font-size: 1rem; font-weight: 700; flex: 1; letter-spacing: -.01em; color: var(--text-secondary); }
-    .settings-body {
-      max-height: 0; overflow: hidden;
-      transition: max-height .35s cubic-bezier(.4,0,.2,1);
-    }
-    .settings-card.open .settings-body { max-height: 500px; }
-    .settings-card.open .settings-chevron { transform: rotate(180deg); }
-    .settings-chevron {
-      color: var(--text-muted); font-size: .9rem;
-      transition: transform var(--transition); display: inline-block;
-    }
-    .settings-body-inner {
-      padding: .75rem 1.25rem 1.25rem;
-      display: flex; flex-direction: column; gap: .75rem;
-    }
-    .settings-desc {
-      font-size: .88rem; color: var(--text-muted); line-height: 1.5;
-    }
-    .settings-actions {
-      display: flex; flex-wrap: wrap; gap: .75rem;
-    }
-    .settings-actions .btn {
-      flex: 1; min-width: 130px; justify-content: center;
-      padding: .75rem 1.25rem; font-size: .95rem; font-weight: 700;
+    /* ── GEAR DROPDOWN ── */
+    .gear-wrapper {
+      position: relative;
     }
     .btn-settings-gear {
       background: transparent; color: var(--text-muted);
@@ -335,15 +320,217 @@
     .btn-settings-gear:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-light); }
     .btn-settings-gear.active { color: var(--accent); border-color: var(--accent-dim); background: var(--accent-glow); }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 600px) {
+    .gear-dropdown {
+      display: none;
+      position: absolute; top: calc(100% + .6rem); right: 0;
+      min-width: 260px;
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      z-index: 300;
+      overflow: hidden;
+      animation: slideUp .18s ease;
+    }
+    .gear-dropdown.open { display: block; }
+    .gear-dropdown-title {
+      padding: .7rem 1rem;
+      font-size: .78rem; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+    .gear-dropdown-actions {
+      display: flex; flex-direction: column; gap: 0;
+      padding: .5rem;
+    }
+    .gear-dropdown-actions .btn {
+      justify-content: flex-start;
+      padding: .7rem .9rem; font-size: .95rem; font-weight: 600;
+      width: 100%; border-radius: 8px;
+    }
+
+    /* ── PARTNER MODAL ── */
+    .partner-tabs {
+      display: flex; gap: 0; border-bottom: 2px solid var(--border);
+      margin-bottom: 1.1rem;
+    }
+    .partner-tab {
+      background: transparent; border: none; padding: .6rem 1rem;
+      font-size: .88rem; font-weight: 600; color: var(--text-muted);
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      cursor: pointer; transition: color var(--transition), border-color var(--transition);
+    }
+    .partner-tab:hover { color: var(--text); }
+    .partner-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .partner-panel { display: none; }
+    .partner-panel.active { display: block; }
+    .partner-list { display: flex; flex-direction: column; gap: .55rem; margin-bottom: 1rem; }
+    .partner-entry {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .7rem 1rem;
+      display: flex; align-items: flex-start; gap: .75rem;
+    }
+    .partner-entry-info { flex: 1; min-width: 0; }
+    .partner-entry-name { font-size: .95rem; font-weight: 700; margin-bottom: .15rem; }
+    .partner-entry-details { font-size: .82rem; color: var(--text-muted); line-height: 1.5; }
+    .partner-entry-details a { color: var(--accent); }
+    .partner-entry-actions { display: flex; gap: .3rem; flex-shrink: 0; }
+    .partner-entry-actions button { background: transparent; padding: .3rem .4rem; border-radius: 6px; font-size: .9rem; color: var(--text-muted); }
+    .partner-entry-actions button:hover { background: var(--surface-3); color: var(--text); }
+    .partner-entry-actions .btn-del-p:hover { color: var(--danger); background: rgba(248,113,113,.1); }
+    .partner-empty { text-align: center; color: var(--text-muted); padding: 1.5rem 1rem; font-size: .9rem; font-style: italic; }
+    .partner-add-btn {
+      display: flex; align-items: center; gap: .4rem;
+      width: 100%; padding: .6rem .9rem;
+      background: var(--accent-glow); border: 1px dashed var(--accent-dim);
+      border-radius: var(--radius); color: var(--accent);
+      font-size: .88rem; font-weight: 600; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .partner-add-btn:hover { background: rgba(91,164,245,.22); border-color: var(--accent); }
+    /* partner sub-form */
+    .partner-form {
+      background: var(--surface-2); border: 1px solid var(--border-light);
+      border-radius: var(--radius); padding: .85rem .9rem;
+      display: none; flex-direction: column; gap: .65rem;
+      margin-bottom: .75rem;
+    }
+    .partner-form.open { display: flex; }
+    .partner-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+    .partner-form-group { display: flex; flex-direction: column; gap: .25rem; }
+    .partner-form-group.full { grid-column: 1 / -1; }
+    .partner-form-group label { font-size: .78rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .05em; }
+    .partner-form-group input,
+    .partner-form-group textarea {
+      background: var(--surface-3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .5rem .75rem; color: var(--text); font-size: .9rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .partner-form-group input:focus,
+    .partner-form-group textarea:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-glow); }
+    .partner-form-group textarea { resize: vertical; min-height: 60px; }
+    .partner-form-footer { display: flex; justify-content: flex-end; gap: .5rem; margin-top: .25rem; }
+
+    /* ── SAFE AREA (notch / home-bar) ── */
+    .navbar {
+      padding-left:  max(1.5rem, env(safe-area-inset-left));
+      padding-right: max(1.5rem, env(safe-area-inset-right));
+    }
+    .main {
+      padding-left:  max(1.25rem, env(safe-area-inset-left));
+      padding-right: max(1.25rem, env(safe-area-inset-right));
+      padding-bottom: max(4rem, calc(2rem + env(safe-area-inset-bottom)));
+    }
+
+    /* ── MOBILE CARD VIEW per tabelle ── */
+    .mobile-card-list { display: none; }
+    .mobile-card {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .85rem 1rem;
+      margin-bottom: .6rem;
+    }
+    .mobile-card-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: .5rem; padding: .2rem 0;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .mobile-card-row:last-of-type { border-bottom: none; }
+    .mobile-card-key {
+      font-size: .75rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0;
+    }
+    .mobile-card-val {
+      font-size: .9rem; color: var(--text); text-align: right;
+      word-break: break-word; min-width: 0;
+    }
+    .mobile-card-actions {
+      display: flex; gap: .5rem; justify-content: flex-end;
+      margin-top: .65rem; padding-top: .5rem;
+      border-top: 1px solid var(--border);
+    }
+    .mobile-card-actions .btn { flex: 1; justify-content: center; font-size: .88rem; min-height: 40px; }
+
+    /* ── TABLET (≤ 900px) ── */
+    @media (max-width: 900px) {
+      .main { max-width: 100%; }
+      th, td { padding: .65rem .85rem; }
+    }
+
+    /* ── PHABLET (≤ 680px) ── */
+    @media (max-width: 680px) {
       html { font-size: 15px; }
       .form-grid { grid-template-columns: 1fr; }
-      .navbar { padding: .75rem 1rem; }
+      .partner-form-grid { grid-template-columns: 1fr; }
+      .navbar {
+        padding-top: .7rem; padding-bottom: .7rem;
+        gap: .6rem;
+      }
+      .navbar-search { min-width: 0; }
       .section-header { padding: .85rem 1rem; }
+      .section-header-actions .btn span.btn-label { display: none; }
       .section-body-inner { padding: .2rem .85rem 1rem; }
-      td, th { padding: .6rem .7rem; }
-      .settings-actions .btn { min-width: 100%; }
+      .section-icon { font-size: 1.3rem; }
+      .section-title { font-size: 1rem; }
+      .gear-dropdown { min-width: 230px; }
+      .partner-tabs { overflow-x: auto; flex-wrap: nowrap; }
+      .partner-tab { white-space: nowrap; flex-shrink: 0; padding: .55rem .8rem; font-size: .82rem; }
+    }
+
+    /* ── MOBILE (≤ 480px): card-view tabelle ── */
+    @media (max-width: 480px) {
+      html { font-size: 14px; }
+      .navbar {
+        padding-left:  max(.9rem, env(safe-area-inset-left));
+        padding-right: max(.9rem, env(safe-area-inset-right));
+      }
+      /* Nascondi tabella, mostra card */
+      .table-wrap { display: none; }
+      .mobile-card-list { display: block; }
+      /* Sezione header: nascondi testi bottoni */
+      .section-header-actions .btn { padding: .4rem .55rem; font-size: 0; gap: 0; }
+      .section-header-actions .btn::before { font-size: .85rem; }
+      .btn-add-item::before  { content: '+'; font-size: 1rem; font-weight: 800; }
+      .btn-open-fields::before { content: '⚙'; font-size: .95rem; }
+      /* Main padding */
+      .main { padding: 1rem .75rem max(3rem, calc(1rem + env(safe-area-inset-bottom))); }
+      .section-body-inner { padding: .15rem .65rem .9rem; }
+      .toolbar { gap: .4rem; margin-bottom: 1rem; }
+      .toolbar-title { display: none; }
+      .modal { margin: .5rem; max-height: calc(100dvh - 1rem); border-radius: var(--radius); }
+      .modal-body { padding: 1rem 1.1rem; }
+      .modal-header, .modal-footer { padding: .85rem 1.1rem; }
+      .modal-footer { gap: .5rem; }
+      .modal-footer .btn { flex: 1; justify-content: center; min-height: 44px; }
+      .gear-dropdown {
+        position: fixed; top: auto; bottom: calc(env(safe-area-inset-bottom) + .5rem);
+        right: .75rem; left: .75rem; min-width: unset; width: auto;
+        max-width: 100%;
+      }
+    }
+
+    /* ── SMALL PHONE (≤ 360px) ── */
+    @media (max-width: 360px) {
+      html { font-size: 13px; }
+      .navbar-brand span.logo { font-size: 1.3rem; }
+      .navbar-brand { font-size: 1rem; }
+    }
+
+    /* ── TOUCH: target minimi 44px ── */
+    @media (pointer: coarse) {
+      .btn { min-height: 44px; }
+      .btn-settings-gear { min-height: 44px; min-width: 44px; }
+      .section-header { min-height: 56px; }
+      .td-actions button { min-height: 40px; min-width: 40px; }
+      .partner-add-btn { min-height: 44px; }
+      .partner-entry-actions button { min-height: 40px; min-width: 40px; }
+      .modal-close { min-height: 44px; min-width: 44px; }
+    }
+
+    /* ── LARGE SCREEN (≥ 1400px) ── */
+    @media (min-width: 1400px) {
+      .main { max-width: 1300px; }
+      html { font-size: 17px; }
     }
   </style>
 </head>
@@ -360,39 +547,29 @@
     <input type="text" id="globalSearch" placeholder="Cerca in tutto l'archivio…" oninput="filterAll()" />
   </div>
   <div class="navbar-actions">
-    <button class="btn-settings-gear" id="settingsGearBtn" onclick="toggleSettingsPanel()" title="Impostazioni">⚙</button>
+    <div class="gear-wrapper">
+      <button class="btn-settings-gear" id="settingsGearBtn" onclick="toggleSettingsPanel()" title="Dati">⚙</button>
+      <div class="gear-dropdown" id="gearDropdown">
+        <div class="gear-dropdown-title">Gestione</div>
+        <div class="gear-dropdown-actions">
+          <button class="btn btn-ghost" onclick="openPartnerModal();toggleSettingsPanel()">🤝&nbsp; Partner &amp; Sponsor</button>
+        </div>
+        <div class="gear-dropdown-title" style="margin-top:.25rem">Dati</div>
+        <div class="gear-dropdown-actions">
+          <button class="btn btn-ghost" onclick="exportData()">⬇&nbsp; Esporta archivio</button>
+          <label class="btn btn-ghost" style="cursor:pointer">
+            ⬆&nbsp; Importa archivio
+            <input type="file" accept=".json" style="display:none" onchange="importData(event)" />
+          </label>
+          <button class="btn btn-danger" onclick="confirmClearAll()">🗑&nbsp; Reset completo</button>
+        </div>
+      </div>
+    </div>
   </div>
 </nav>
 
 <!-- ── MAIN ── -->
 <div class="main">
-
-  <!-- IMPOSTAZIONI -->
-  <div class="settings-card" id="settingsCard">
-    <div class="settings-header" onclick="toggleSettingsPanel()">
-      <span class="settings-icon">⚙</span>
-      <span class="settings-title">Impostazioni &amp; Dati</span>
-      <span class="settings-chevron">▼</span>
-    </div>
-    <div class="settings-body">
-      <div class="settings-body-inner">
-        <p class="settings-desc">Esporta il tuo archivio come file JSON per salvarlo o condividerlo. Importa un file JSON per ripristinare i dati. Usa il reset per cancellare tutto.</p>
-        <div class="settings-actions">
-          <button class="btn btn-ghost" onclick="exportData()">
-            ⬇&nbsp; Esporta archivio
-          </button>
-          <label class="btn btn-ghost" style="cursor:pointer">
-            ⬆&nbsp; Importa archivio
-            <input type="file" accept=".json" style="display:none" onchange="importData(event)" />
-          </label>
-          <button class="btn btn-danger" onclick="confirmClearAll()">
-            🗑&nbsp; Reset completo
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="toolbar">
     <span class="toolbar-title">Sezioni:</span>
     <button class="btn btn-ghost" onclick="toggleAll(true)">⊞ Espandi tutto</button>
@@ -445,6 +622,83 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeFieldsModal()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL PARTNER ── -->
+<div id="partnerModal" class="modal-backdrop" style="display:none" onclick="closePartnerModal(event)">
+  <div class="modal" style="max-width:640px" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>🤝 Partner &amp; Sponsor</h3>
+      <button class="modal-close" onclick="closePartnerModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- TABS -->
+      <div class="partner-tabs">
+        <button class="partner-tab active" onclick="switchPartnerTab('negozi',this)">🏪 Negozi di pesca</button>
+        <button class="partner-tab" onclick="switchPartnerTab('associazioni',this)">🏅 Associazioni</button>
+        <button class="partner-tab" onclick="switchPartnerTab('maestri',this)">🎓 Maestri di pesca</button>
+      </div>
+      <!-- PANEL NEGOZI -->
+      <div class="partner-panel active" id="panel-negozi">
+        <div class="partner-form" id="form-negozi">
+          <div class="partner-form-grid">
+            <div class="partner-form-group full"><label>Nome negozio *</label><input type="text" id="neg-nome" placeholder="es. Pesca Sport Roma" /></div>
+            <div class="partner-form-group"><label>Telefono</label><input type="text" id="neg-tel" placeholder="es. 06 1234567" /></div>
+            <div class="partner-form-group"><label>Email</label><input type="text" id="neg-email" placeholder="es. info@negozio.it" /></div>
+            <div class="partner-form-group full"><label>Indirizzo</label><input type="text" id="neg-indirizzo" placeholder="es. Via Roma 12, Roma" /></div>
+            <div class="partner-form-group full"><label>Sito web</label><input type="text" id="neg-sito" placeholder="es. https://negozio.it" /></div>
+            <div class="partner-form-group full"><label>Note</label><textarea id="neg-note" rows="2"></textarea></div>
+          </div>
+          <div class="partner-form-footer">
+            <button class="btn btn-ghost" onclick="cancelPartnerForm('negozi')">Annulla</button>
+            <button class="btn btn-accent" onclick="savePartner('negozi')">Salva</button>
+          </div>
+        </div>
+        <div class="partner-list" id="list-negozi"></div>
+        <button class="partner-add-btn" onclick="openPartnerForm('negozi')">+ Aggiungi negozio</button>
+      </div>
+      <!-- PANEL ASSOCIAZIONI -->
+      <div class="partner-panel" id="panel-associazioni">
+        <div class="partner-form" id="form-associazioni">
+          <div class="partner-form-grid">
+            <div class="partner-form-group full"><label>Nome associazione *</label><input type="text" id="ass-nome" placeholder="es. FIPSAS Lazio" /></div>
+            <div class="partner-form-group"><label>Telefono</label><input type="text" id="ass-tel" placeholder="es. 06 1234567" /></div>
+            <div class="partner-form-group"><label>Email</label><input type="text" id="ass-email" placeholder="es. info@fipsas.it" /></div>
+            <div class="partner-form-group full"><label>Descrizione</label><input type="text" id="ass-desc" placeholder="es. Federazione pesca sportiva" /></div>
+            <div class="partner-form-group full"><label>Sito web</label><input type="text" id="ass-sito" placeholder="es. https://fipsas.it" /></div>
+            <div class="partner-form-group full"><label>Note</label><textarea id="ass-note" rows="2"></textarea></div>
+          </div>
+          <div class="partner-form-footer">
+            <button class="btn btn-ghost" onclick="cancelPartnerForm('associazioni')">Annulla</button>
+            <button class="btn btn-accent" onclick="savePartner('associazioni')">Salva</button>
+          </div>
+        </div>
+        <div class="partner-list" id="list-associazioni"></div>
+        <button class="partner-add-btn" onclick="openPartnerForm('associazioni')">+ Aggiungi associazione</button>
+      </div>
+      <!-- PANEL MAESTRI -->
+      <div class="partner-panel" id="panel-maestri">
+        <div class="partner-form" id="form-maestri">
+          <div class="partner-form-grid">
+            <div class="partner-form-group full"><label>Nome *</label><input type="text" id="mae-nome" placeholder="es. Mario Rossi" /></div>
+            <div class="partner-form-group"><label>Telefono</label><input type="text" id="mae-tel" placeholder="es. 333 1234567" /></div>
+            <div class="partner-form-group"><label>Email</label><input type="text" id="mae-email" placeholder="es. mario@pesca.it" /></div>
+            <div class="partner-form-group full"><label>Specialità</label><input type="text" id="mae-spec" placeholder="es. Surfcasting, Spinning" /></div>
+            <div class="partner-form-group full"><label>Note</label><textarea id="mae-note" rows="2"></textarea></div>
+          </div>
+          <div class="partner-form-footer">
+            <button class="btn btn-ghost" onclick="cancelPartnerForm('maestri')">Annulla</button>
+            <button class="btn btn-accent" onclick="savePartner('maestri')">Salva</button>
+          </div>
+        </div>
+        <div class="partner-list" id="list-maestri"></div>
+        <button class="partner-add-btn" onclick="openPartnerForm('maestri')">+ Aggiungi maestro</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closePartnerModal()">Chiudi</button>
     </div>
   </div>
 </div>
@@ -565,6 +819,22 @@ const DEFAULTS = [
       { key: 'tipo',      label: 'Tipo',     type: 'text',   required: false, custom: false, placeholder: 'es. Limerick, Aberdeen' },
       { key: 'quantita',  label: 'Quantità', type: 'number', required: false, custom: false },
       { key: 'note',      label: 'Note',     type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'bobbine',
+    name: 'Bobbine',
+    icon: '🪡',
+    collapsed: true,
+    fields: [
+      { key: 'marca',       label: 'Marca',              type: 'text',     required: true,  custom: false },
+      { key: 'modello',     label: 'Modello',            type: 'text',     required: false, custom: false },
+      { key: 'tipo',        label: 'Tipo',               type: 'text',     required: false, custom: false, placeholder: 'es. Porta-filo, Extra, Spare' },
+      { key: 'capacita',    label: 'Capacità (m/mm)',    type: 'text',     required: false, custom: false, placeholder: 'es. 300m / 0.30' },
+      { key: 'compatibile', label: 'Compatibile con',   type: 'text',     required: false, custom: false, placeholder: 'es. Shimano Ultegra 14000' },
+      { key: 'stato',       label: 'Stato',              type: 'text',     required: false, custom: false, placeholder: 'Ottimo / Buono / Da revisionare' },
+      { key: 'note',        label: 'Note',               type: 'textarea', required: false, custom: false },
     ],
     items: []
   },
@@ -697,8 +967,8 @@ function renderSection(s) {
     <span class="section-title">${esc(s.name)}</span>
     <span class="section-badge">${filteredItems.length}${q && filteredItems.length !== s.items.length ? '/'+s.items.length : ''}</span>
     <div class="section-header-actions" onclick="event.stopPropagation()">
-      <button class="btn btn-ghost" onclick="openItemModal('${s.id}')" title="Aggiungi elemento">+ Aggiungi</button>
-      <button class="btn btn-ghost" onclick="openFieldsModal('${s.id}')" title="Gestisci campi">⚙ Campi</button>
+      <button class="btn btn-ghost btn-add-item" onclick="openItemModal('${s.id}')" title="Aggiungi elemento"><span class="btn-label">+ Aggiungi</span></button>
+      <button class="btn btn-ghost btn-open-fields" onclick="openFieldsModal('${s.id}')" title="Gestisci campi"><span class="btn-label">⚙ Campi</span></button>
     </div>
     <span class="chevron">▼</span>
   `;
@@ -744,6 +1014,34 @@ function renderSection(s) {
 
   wrap.innerHTML = `<table>${thead}${tbody}</table>`;
   inner.appendChild(wrap);
+
+  // Mobile card view
+  const cardList = document.createElement('div');
+  cardList.className = 'mobile-card-list';
+  if (filteredItems.length === 0) {
+    cardList.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:2rem 1rem;font-style:italic;font-size:.9rem">Nessun elemento. Usa "+ Aggiungi" per iniziare.</p>`;
+  } else {
+    filteredItems.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'mobile-card';
+      let rows = '';
+      s.fields.forEach(f => {
+        const val = item[f.key] !== undefined && item[f.key] !== '' ? String(item[f.key]) : null;
+        if (!val) return;
+        rows += `<div class="mobile-card-row">
+          <span class="mobile-card-key">${esc(f.label)}</span>
+          <span class="mobile-card-val">${highlight(esc(val), q)}</span>
+        </div>`;
+      });
+      card.innerHTML = `${rows}
+        <div class="mobile-card-actions">
+          <button class="btn btn-ghost" onclick="openItemModal('${s.id}','${item.id}')">✏️ Modifica</button>
+          <button class="btn btn-danger" onclick="deleteItem('${s.id}','${item.id}')">🗑️ Elimina</button>
+        </div>`;
+      cardList.appendChild(card);
+    });
+  }
+  inner.appendChild(cardList);
   body.appendChild(inner);
 
   card.appendChild(hdr);
@@ -970,8 +1268,9 @@ function showToast(msg, type = 'success') {
 // ─────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    document.getElementById('itemModal').style.display   = 'none';
-    document.getElementById('fieldsModal').style.display = 'none';
+    document.getElementById('itemModal').style.display    = 'none';
+    document.getElementById('fieldsModal').style.display  = 'none';
+    document.getElementById('partnerModal').style.display = 'none';
   }
   // Ctrl/Cmd + F → focus search
   if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
@@ -991,14 +1290,143 @@ document.addEventListener('keydown', e => {
 });
 
 // ─────────────────────────────────────────────
-//  SETTINGS PANEL
+//  PARTNER & SPONSOR
+// ─────────────────────────────────────────────
+const PARTNER_CATEGORIES = {
+  negozi:       { label: 'Negozio di pesca',   fields: ['neg-nome','neg-tel','neg-email','neg-indirizzo','neg-sito','neg-note'],   keys: ['nome','tel','email','indirizzo','sito','note'] },
+  associazioni: { label: 'Associazione',        fields: ['ass-nome','ass-tel','ass-email','ass-desc','ass-sito','ass-note'],        keys: ['nome','tel','email','desc','sito','note'] },
+  maestri:      { label: 'Maestro di pesca',    fields: ['mae-nome','mae-tel','mae-email','mae-spec','mae-note'],                   keys: ['nome','tel','email','spec','note'] },
+};
+let _partnerEditId   = null;
+let _partnerEditCat  = null;
+let _activePartnerTab = 'negozi';
+
+function loadPartners() {
+  try {
+    const raw = localStorage.getItem('surfcasting_partners');
+    return raw ? JSON.parse(raw) : { negozi: [], associazioni: [], maestri: [] };
+  } catch(e) { return { negozi: [], associazioni: [], maestri: [] }; }
+}
+function savePartners(data) {
+  localStorage.setItem('surfcasting_partners', JSON.stringify(data));
+}
+
+function openPartnerModal() {
+  _partnerEditId = _partnerEditCat = null;
+  renderPartnerLists();
+  document.getElementById('partnerModal').style.display = 'flex';
+}
+function closePartnerModal(event) {
+  if (event && event.target !== document.getElementById('partnerModal')) return;
+  document.getElementById('partnerModal').style.display = 'none';
+}
+
+function switchPartnerTab(cat, btn) {
+  _activePartnerTab = cat;
+  document.querySelectorAll('.partner-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.partner-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + cat).classList.add('active');
+  cancelPartnerForm(cat);
+}
+
+function openPartnerForm(cat, editId = null) {
+  const cfg   = PARTNER_CATEGORIES[cat];
+  const data  = loadPartners();
+  const entry = editId ? data[cat].find(e => e.id === editId) : null;
+  _partnerEditId  = editId;
+  _partnerEditCat = cat;
+  cfg.fields.forEach((fid, i) => {
+    const el = document.getElementById(fid);
+    if (el) el.value = entry ? (entry[cfg.keys[i]] || '') : '';
+  });
+  document.getElementById('form-' + cat).classList.add('open');
+}
+
+function cancelPartnerForm(cat) {
+  const form = document.getElementById('form-' + cat);
+  if (form) form.classList.remove('open');
+  _partnerEditId = _partnerEditCat = null;
+}
+
+function savePartner(cat) {
+  const cfg   = PARTNER_CATEGORIES[cat];
+  const nome  = document.getElementById(cfg.fields[0]).value.trim();
+  if (!nome) { document.getElementById(cfg.fields[0]).focus(); return; }
+  const data  = loadPartners();
+  const entry = _partnerEditId ? data[cat].find(e => e.id === _partnerEditId) : { id: uid() };
+  cfg.fields.forEach((fid, i) => {
+    const el = document.getElementById(fid);
+    if (el) entry[cfg.keys[i]] = el.value.trim();
+  });
+  if (!_partnerEditId) data[cat].push(entry);
+  savePartners(data);
+  cancelPartnerForm(cat);
+  renderPartnerList(cat);
+  showToast('Salvato ✓', 'success');
+}
+
+function deletePartner(cat, id) {
+  if (!confirm('Eliminare questo elemento?')) return;
+  const data = loadPartners();
+  data[cat] = data[cat].filter(e => e.id !== id);
+  savePartners(data);
+  renderPartnerList(cat);
+}
+
+function renderPartnerLists() {
+  ['negozi','associazioni','maestri'].forEach(renderPartnerList);
+}
+
+function renderPartnerList(cat) {
+  const data  = loadPartners();
+  const list  = document.getElementById('list-' + cat);
+  const items = data[cat] || [];
+  if (items.length === 0) {
+    list.innerHTML = '<div class="partner-empty">Nessun elemento. Usa "+ Aggiungi" per iniziare.</div>';
+    return;
+  }
+  list.innerHTML = items.map(e => {
+    const details = [
+      e.tel    ? `📞 ${esc(e.tel)}`    : '',
+      e.email  ? `✉️ ${esc(e.email)}`  : '',
+      e.indirizzo ? `📍 ${esc(e.indirizzo)}` : '',
+      e.desc   ? esc(e.desc)           : '',
+      e.spec   ? `🎯 ${esc(e.spec)}`   : '',
+      e.sito   ? `<a href="${esc(e.sito)}" target="_blank" rel="noopener">🌐 ${esc(e.sito)}</a>` : '',
+      e.note   ? `<em>${esc(e.note)}</em>` : '',
+    ].filter(Boolean).join(' · ');
+    return `<div class="partner-entry">
+      <div class="partner-entry-info">
+        <div class="partner-entry-name">${esc(e.nome)}</div>
+        ${details ? `<div class="partner-entry-details">${details}</div>` : ''}
+      </div>
+      <div class="partner-entry-actions">
+        <button onclick="openPartnerForm('${cat}','${e.id}')" title="Modifica">✏️</button>
+        <button class="btn-del-p" onclick="deletePartner('${cat}','${e.id}')" title="Elimina">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────
+//  GEAR DROPDOWN
 // ─────────────────────────────────────────────
 function toggleSettingsPanel() {
-  const card = document.getElementById('settingsCard');
+  const drop = document.getElementById('gearDropdown');
   const gear = document.getElementById('settingsGearBtn');
-  const isOpen = card.classList.toggle('open');
+  const isOpen = drop.classList.toggle('open');
   gear.classList.toggle('active', isOpen);
 }
+
+// Chiudi il dropdown cliccando fuori
+document.addEventListener('click', e => {
+  const wrapper = document.querySelector('.gear-wrapper');
+  if (wrapper && !wrapper.contains(e.target)) {
+    document.getElementById('gearDropdown').classList.remove('open');
+    document.getElementById('settingsGearBtn').classList.remove('active');
+  }
+});
 
 // ─────────────────────────────────────────────
 //  INIT
