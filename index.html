@@ -325,6 +325,68 @@
       width: 100%; border-radius: 8px;
     }
 
+    /* ── PARTNER MODAL ── */
+    .partner-tabs {
+      display: flex; gap: 0; border-bottom: 2px solid var(--border);
+      margin-bottom: 1.1rem;
+    }
+    .partner-tab {
+      background: transparent; border: none; padding: .6rem 1rem;
+      font-size: .88rem; font-weight: 600; color: var(--text-muted);
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      cursor: pointer; transition: color var(--transition), border-color var(--transition);
+    }
+    .partner-tab:hover { color: var(--text); }
+    .partner-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .partner-panel { display: none; }
+    .partner-panel.active { display: block; }
+    .partner-list { display: flex; flex-direction: column; gap: .55rem; margin-bottom: 1rem; }
+    .partner-entry {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .7rem 1rem;
+      display: flex; align-items: flex-start; gap: .75rem;
+    }
+    .partner-entry-info { flex: 1; min-width: 0; }
+    .partner-entry-name { font-size: .95rem; font-weight: 700; margin-bottom: .15rem; }
+    .partner-entry-details { font-size: .82rem; color: var(--text-muted); line-height: 1.5; }
+    .partner-entry-details a { color: var(--accent); }
+    .partner-entry-actions { display: flex; gap: .3rem; flex-shrink: 0; }
+    .partner-entry-actions button { background: transparent; padding: .3rem .4rem; border-radius: 6px; font-size: .9rem; color: var(--text-muted); }
+    .partner-entry-actions button:hover { background: var(--surface-3); color: var(--text); }
+    .partner-entry-actions .btn-del-p:hover { color: var(--danger); background: rgba(248,113,113,.1); }
+    .partner-empty { text-align: center; color: var(--text-muted); padding: 1.5rem 1rem; font-size: .9rem; font-style: italic; }
+    .partner-add-btn {
+      display: flex; align-items: center; gap: .4rem;
+      width: 100%; padding: .6rem .9rem;
+      background: var(--accent-glow); border: 1px dashed var(--accent-dim);
+      border-radius: var(--radius); color: var(--accent);
+      font-size: .88rem; font-weight: 600; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .partner-add-btn:hover { background: rgba(91,164,245,.22); border-color: var(--accent); }
+    /* partner sub-form */
+    .partner-form {
+      background: var(--surface-2); border: 1px solid var(--border-light);
+      border-radius: var(--radius); padding: .85rem .9rem;
+      display: none; flex-direction: column; gap: .65rem;
+      margin-bottom: .75rem;
+    }
+    .partner-form.open { display: flex; }
+    .partner-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+    .partner-form-group { display: flex; flex-direction: column; gap: .25rem; }
+    .partner-form-group.full { grid-column: 1 / -1; }
+    .partner-form-group label { font-size: .78rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .05em; }
+    .partner-form-group input,
+    .partner-form-group textarea {
+      background: var(--surface-3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .5rem .75rem; color: var(--text); font-size: .9rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .partner-form-group input:focus,
+    .partner-form-group textarea:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-glow); }
+    .partner-form-group textarea { resize: vertical; min-height: 60px; }
+    .partner-form-footer { display: flex; justify-content: flex-end; gap: .5rem; margin-top: .25rem; }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 600px) {
       html { font-size: 15px; }
@@ -354,6 +416,10 @@
       <button class="btn-settings-gear" id="settingsGearBtn" onclick="toggleSettingsPanel()" title="Dati">⚙</button>
       <div class="gear-dropdown" id="gearDropdown">
         <div class="gear-dropdown-title">Dati</div>
+        <div class="gear-dropdown-actions">
+          <button class="btn btn-ghost" onclick="openPartnerModal();toggleSettingsPanel()">🤝&nbsp; Partner &amp; Sponsor</button>
+        </div>
+        <div class="gear-dropdown-title" style="margin-top:.25rem">Dati</div>
         <div class="gear-dropdown-actions">
           <button class="btn btn-ghost" onclick="exportData()">⬇&nbsp; Esporta archivio</button>
           <label class="btn btn-ghost" style="cursor:pointer">
@@ -421,6 +487,83 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeFieldsModal()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL PARTNER ── -->
+<div id="partnerModal" class="modal-backdrop" style="display:none" onclick="closePartnerModal(event)">
+  <div class="modal" style="max-width:640px" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>🤝 Partner &amp; Sponsor</h3>
+      <button class="modal-close" onclick="closePartnerModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- TABS -->
+      <div class="partner-tabs">
+        <button class="partner-tab active" onclick="switchPartnerTab('negozi',this)">🏪 Negozi di pesca</button>
+        <button class="partner-tab" onclick="switchPartnerTab('associazioni',this)">🏅 Associazioni</button>
+        <button class="partner-tab" onclick="switchPartnerTab('maestri',this)">🎓 Maestri di pesca</button>
+      </div>
+      <!-- PANEL NEGOZI -->
+      <div class="partner-panel active" id="panel-negozi">
+        <div class="partner-form" id="form-negozi">
+          <div class="partner-form-grid">
+            <div class="partner-form-group full"><label>Nome negozio *</label><input type="text" id="neg-nome" placeholder="es. Pesca Sport Roma" /></div>
+            <div class="partner-form-group"><label>Telefono</label><input type="text" id="neg-tel" placeholder="es. 06 1234567" /></div>
+            <div class="partner-form-group"><label>Email</label><input type="text" id="neg-email" placeholder="es. info@negozio.it" /></div>
+            <div class="partner-form-group full"><label>Indirizzo</label><input type="text" id="neg-indirizzo" placeholder="es. Via Roma 12, Roma" /></div>
+            <div class="partner-form-group full"><label>Sito web</label><input type="text" id="neg-sito" placeholder="es. https://negozio.it" /></div>
+            <div class="partner-form-group full"><label>Note</label><textarea id="neg-note" rows="2"></textarea></div>
+          </div>
+          <div class="partner-form-footer">
+            <button class="btn btn-ghost" onclick="cancelPartnerForm('negozi')">Annulla</button>
+            <button class="btn btn-accent" onclick="savePartner('negozi')">Salva</button>
+          </div>
+        </div>
+        <div class="partner-list" id="list-negozi"></div>
+        <button class="partner-add-btn" onclick="openPartnerForm('negozi')">+ Aggiungi negozio</button>
+      </div>
+      <!-- PANEL ASSOCIAZIONI -->
+      <div class="partner-panel" id="panel-associazioni">
+        <div class="partner-form" id="form-associazioni">
+          <div class="partner-form-grid">
+            <div class="partner-form-group full"><label>Nome associazione *</label><input type="text" id="ass-nome" placeholder="es. FIPSAS Lazio" /></div>
+            <div class="partner-form-group"><label>Telefono</label><input type="text" id="ass-tel" placeholder="es. 06 1234567" /></div>
+            <div class="partner-form-group"><label>Email</label><input type="text" id="ass-email" placeholder="es. info@fipsas.it" /></div>
+            <div class="partner-form-group full"><label>Descrizione</label><input type="text" id="ass-desc" placeholder="es. Federazione pesca sportiva" /></div>
+            <div class="partner-form-group full"><label>Sito web</label><input type="text" id="ass-sito" placeholder="es. https://fipsas.it" /></div>
+            <div class="partner-form-group full"><label>Note</label><textarea id="ass-note" rows="2"></textarea></div>
+          </div>
+          <div class="partner-form-footer">
+            <button class="btn btn-ghost" onclick="cancelPartnerForm('associazioni')">Annulla</button>
+            <button class="btn btn-accent" onclick="savePartner('associazioni')">Salva</button>
+          </div>
+        </div>
+        <div class="partner-list" id="list-associazioni"></div>
+        <button class="partner-add-btn" onclick="openPartnerForm('associazioni')">+ Aggiungi associazione</button>
+      </div>
+      <!-- PANEL MAESTRI -->
+      <div class="partner-panel" id="panel-maestri">
+        <div class="partner-form" id="form-maestri">
+          <div class="partner-form-grid">
+            <div class="partner-form-group full"><label>Nome *</label><input type="text" id="mae-nome" placeholder="es. Mario Rossi" /></div>
+            <div class="partner-form-group"><label>Telefono</label><input type="text" id="mae-tel" placeholder="es. 333 1234567" /></div>
+            <div class="partner-form-group"><label>Email</label><input type="text" id="mae-email" placeholder="es. mario@pesca.it" /></div>
+            <div class="partner-form-group full"><label>Specialità</label><input type="text" id="mae-spec" placeholder="es. Surfcasting, Spinning" /></div>
+            <div class="partner-form-group full"><label>Note</label><textarea id="mae-note" rows="2"></textarea></div>
+          </div>
+          <div class="partner-form-footer">
+            <button class="btn btn-ghost" onclick="cancelPartnerForm('maestri')">Annulla</button>
+            <button class="btn btn-accent" onclick="savePartner('maestri')">Salva</button>
+          </div>
+        </div>
+        <div class="partner-list" id="list-maestri"></div>
+        <button class="partner-add-btn" onclick="openPartnerForm('maestri')">+ Aggiungi maestro</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closePartnerModal()">Chiudi</button>
     </div>
   </div>
 </div>
@@ -541,6 +684,22 @@ const DEFAULTS = [
       { key: 'tipo',      label: 'Tipo',     type: 'text',   required: false, custom: false, placeholder: 'es. Limerick, Aberdeen' },
       { key: 'quantita',  label: 'Quantità', type: 'number', required: false, custom: false },
       { key: 'note',      label: 'Note',     type: 'textarea',required: false,custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'bobbine',
+    name: 'Bobbine',
+    icon: '🪡',
+    collapsed: true,
+    fields: [
+      { key: 'marca',       label: 'Marca',              type: 'text',     required: true,  custom: false },
+      { key: 'modello',     label: 'Modello',            type: 'text',     required: false, custom: false },
+      { key: 'tipo',        label: 'Tipo',               type: 'text',     required: false, custom: false, placeholder: 'es. Porta-filo, Extra, Spare' },
+      { key: 'capacita',    label: 'Capacità (m/mm)',    type: 'text',     required: false, custom: false, placeholder: 'es. 300m / 0.30' },
+      { key: 'compatibile', label: 'Compatibile con',   type: 'text',     required: false, custom: false, placeholder: 'es. Shimano Ultegra 14000' },
+      { key: 'stato',       label: 'Stato',              type: 'text',     required: false, custom: false, placeholder: 'Ottimo / Buono / Da revisionare' },
+      { key: 'note',        label: 'Note',               type: 'textarea', required: false, custom: false },
     ],
     items: []
   },
@@ -946,8 +1105,9 @@ function showToast(msg, type = 'success') {
 // ─────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    document.getElementById('itemModal').style.display   = 'none';
-    document.getElementById('fieldsModal').style.display = 'none';
+    document.getElementById('itemModal').style.display    = 'none';
+    document.getElementById('fieldsModal').style.display  = 'none';
+    document.getElementById('partnerModal').style.display = 'none';
   }
   // Ctrl/Cmd + F → focus search
   if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
@@ -965,6 +1125,126 @@ document.addEventListener('keydown', e => {
     if (active && active.tagName !== 'TEXTAREA') saveItem();
   }
 });
+
+// ─────────────────────────────────────────────
+//  PARTNER & SPONSOR
+// ─────────────────────────────────────────────
+const PARTNER_CATEGORIES = {
+  negozi:       { label: 'Negozio di pesca',   fields: ['neg-nome','neg-tel','neg-email','neg-indirizzo','neg-sito','neg-note'],   keys: ['nome','tel','email','indirizzo','sito','note'] },
+  associazioni: { label: 'Associazione',        fields: ['ass-nome','ass-tel','ass-email','ass-desc','ass-sito','ass-note'],        keys: ['nome','tel','email','desc','sito','note'] },
+  maestri:      { label: 'Maestro di pesca',    fields: ['mae-nome','mae-tel','mae-email','mae-spec','mae-note'],                   keys: ['nome','tel','email','spec','note'] },
+};
+let _partnerEditId   = null;
+let _partnerEditCat  = null;
+let _activePartnerTab = 'negozi';
+
+function loadPartners() {
+  try {
+    const raw = localStorage.getItem('surfcasting_partners');
+    return raw ? JSON.parse(raw) : { negozi: [], associazioni: [], maestri: [] };
+  } catch(e) { return { negozi: [], associazioni: [], maestri: [] }; }
+}
+function savePartners(data) {
+  localStorage.setItem('surfcasting_partners', JSON.stringify(data));
+}
+
+function openPartnerModal() {
+  _partnerEditId = _partnerEditCat = null;
+  renderPartnerLists();
+  document.getElementById('partnerModal').style.display = 'flex';
+}
+function closePartnerModal(event) {
+  if (event && event.target !== document.getElementById('partnerModal')) return;
+  document.getElementById('partnerModal').style.display = 'none';
+}
+
+function switchPartnerTab(cat, btn) {
+  _activePartnerTab = cat;
+  document.querySelectorAll('.partner-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.partner-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + cat).classList.add('active');
+  cancelPartnerForm(cat);
+}
+
+function openPartnerForm(cat, editId = null) {
+  const cfg   = PARTNER_CATEGORIES[cat];
+  const data  = loadPartners();
+  const entry = editId ? data[cat].find(e => e.id === editId) : null;
+  _partnerEditId  = editId;
+  _partnerEditCat = cat;
+  cfg.fields.forEach((fid, i) => {
+    const el = document.getElementById(fid);
+    if (el) el.value = entry ? (entry[cfg.keys[i]] || '') : '';
+  });
+  document.getElementById('form-' + cat).classList.add('open');
+}
+
+function cancelPartnerForm(cat) {
+  const form = document.getElementById('form-' + cat);
+  if (form) form.classList.remove('open');
+  _partnerEditId = _partnerEditCat = null;
+}
+
+function savePartner(cat) {
+  const cfg   = PARTNER_CATEGORIES[cat];
+  const nome  = document.getElementById(cfg.fields[0]).value.trim();
+  if (!nome) { document.getElementById(cfg.fields[0]).focus(); return; }
+  const data  = loadPartners();
+  const entry = _partnerEditId ? data[cat].find(e => e.id === _partnerEditId) : { id: uid() };
+  cfg.fields.forEach((fid, i) => {
+    const el = document.getElementById(fid);
+    if (el) entry[cfg.keys[i]] = el.value.trim();
+  });
+  if (!_partnerEditId) data[cat].push(entry);
+  savePartners(data);
+  cancelPartnerForm(cat);
+  renderPartnerList(cat);
+  showToast('Salvato ✓', 'success');
+}
+
+function deletePartner(cat, id) {
+  if (!confirm('Eliminare questo elemento?')) return;
+  const data = loadPartners();
+  data[cat] = data[cat].filter(e => e.id !== id);
+  savePartners(data);
+  renderPartnerList(cat);
+}
+
+function renderPartnerLists() {
+  ['negozi','associazioni','maestri'].forEach(renderPartnerList);
+}
+
+function renderPartnerList(cat) {
+  const data  = loadPartners();
+  const list  = document.getElementById('list-' + cat);
+  const items = data[cat] || [];
+  if (items.length === 0) {
+    list.innerHTML = '<div class="partner-empty">Nessun elemento. Usa "+ Aggiungi" per iniziare.</div>';
+    return;
+  }
+  list.innerHTML = items.map(e => {
+    const details = [
+      e.tel    ? `📞 ${esc(e.tel)}`    : '',
+      e.email  ? `✉️ ${esc(e.email)}`  : '',
+      e.indirizzo ? `📍 ${esc(e.indirizzo)}` : '',
+      e.desc   ? esc(e.desc)           : '',
+      e.spec   ? `🎯 ${esc(e.spec)}`   : '',
+      e.sito   ? `<a href="${esc(e.sito)}" target="_blank" rel="noopener">🌐 ${esc(e.sito)}</a>` : '',
+      e.note   ? `<em>${esc(e.note)}</em>` : '',
+    ].filter(Boolean).join(' · ');
+    return `<div class="partner-entry">
+      <div class="partner-entry-info">
+        <div class="partner-entry-name">${esc(e.nome)}</div>
+        ${details ? `<div class="partner-entry-details">${details}</div>` : ''}
+      </div>
+      <div class="partner-entry-actions">
+        <button onclick="openPartnerForm('${cat}','${e.id}')" title="Modifica">✏️</button>
+        <button class="btn-del-p" onclick="deletePartner('${cat}','${e.id}')" title="Elimina">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 // ─────────────────────────────────────────────
 //  GEAR DROPDOWN
