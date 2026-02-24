@@ -281,15 +281,69 @@
     ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
+    /* ── SETTINGS PANEL ── */
+    .settings-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: border-color var(--transition);
+    }
+    .settings-card:hover { border-color: var(--border-light); }
+    .settings-header {
+      display: flex; align-items: center; gap: .85rem;
+      padding: 1rem 1.25rem; cursor: pointer;
+      user-select: none;
+      transition: background var(--transition);
+    }
+    .settings-header:hover { background: var(--surface-2); }
+    .settings-icon { font-size: 1.3rem; }
+    .settings-title { font-size: 1rem; font-weight: 700; flex: 1; letter-spacing: -.01em; color: var(--text-secondary); }
+    .settings-body {
+      max-height: 0; overflow: hidden;
+      transition: max-height .35s cubic-bezier(.4,0,.2,1);
+    }
+    .settings-card.open .settings-body { max-height: 500px; }
+    .settings-card.open .settings-chevron { transform: rotate(180deg); }
+    .settings-chevron {
+      color: var(--text-muted); font-size: .9rem;
+      transition: transform var(--transition); display: inline-block;
+    }
+    .settings-body-inner {
+      padding: .75rem 1.25rem 1.25rem;
+      display: flex; flex-direction: column; gap: .75rem;
+    }
+    .settings-desc {
+      font-size: .88rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .settings-actions {
+      display: flex; flex-wrap: wrap; gap: .75rem;
+    }
+    .settings-actions .btn {
+      flex: 1; min-width: 130px; justify-content: center;
+      padding: .75rem 1.25rem; font-size: .95rem; font-weight: 700;
+    }
+    .btn-settings-gear {
+      background: transparent; color: var(--text-muted);
+      padding: .45rem .55rem; border-radius: var(--radius);
+      font-size: 1.25rem; line-height: 1;
+      border: 1px solid var(--border);
+      transition: all var(--transition);
+    }
+    .btn-settings-gear:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-light); }
+    .btn-settings-gear.active { color: var(--accent); border-color: var(--accent-dim); background: var(--accent-glow); }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 600px) {
       html { font-size: 15px; }
       .form-grid { grid-template-columns: 1fr; }
       .navbar { padding: .75rem 1rem; }
-      .navbar-actions .btn span { display: none; }
       .section-header { padding: .85rem 1rem; }
       .section-body-inner { padding: .2rem .85rem 1rem; }
       td, th { padding: .6rem .7rem; }
+      .settings-actions .btn { min-width: 100%; }
     }
   </style>
 </head>
@@ -306,21 +360,39 @@
     <input type="text" id="globalSearch" placeholder="Cerca in tutto l'archivio…" oninput="filterAll()" />
   </div>
   <div class="navbar-actions">
-    <button class="btn btn-ghost" onclick="exportData()" title="Esporta JSON">
-      <span>⬇</span><span> Esporta</span>
-    </button>
-    <label class="btn btn-ghost" title="Importa JSON" style="cursor:pointer">
-      <span>⬆</span><span> Importa</span>
-      <input type="file" accept=".json" style="display:none" onchange="importData(event)" />
-    </label>
-    <button class="btn btn-danger" onclick="confirmClearAll()" title="Svuota tutto">
-      <span>🗑</span><span> Reset</span>
-    </button>
+    <button class="btn-settings-gear" id="settingsGearBtn" onclick="toggleSettingsPanel()" title="Impostazioni">⚙</button>
   </div>
 </nav>
 
 <!-- ── MAIN ── -->
 <div class="main">
+
+  <!-- IMPOSTAZIONI -->
+  <div class="settings-card" id="settingsCard">
+    <div class="settings-header" onclick="toggleSettingsPanel()">
+      <span class="settings-icon">⚙</span>
+      <span class="settings-title">Impostazioni &amp; Dati</span>
+      <span class="settings-chevron">▼</span>
+    </div>
+    <div class="settings-body">
+      <div class="settings-body-inner">
+        <p class="settings-desc">Esporta il tuo archivio come file JSON per salvarlo o condividerlo. Importa un file JSON per ripristinare i dati. Usa il reset per cancellare tutto.</p>
+        <div class="settings-actions">
+          <button class="btn btn-ghost" onclick="exportData()">
+            ⬇&nbsp; Esporta archivio
+          </button>
+          <label class="btn btn-ghost" style="cursor:pointer">
+            ⬆&nbsp; Importa archivio
+            <input type="file" accept=".json" style="display:none" onchange="importData(event)" />
+          </label>
+          <button class="btn btn-danger" onclick="confirmClearAll()">
+            🗑&nbsp; Reset completo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="toolbar">
     <span class="toolbar-title">Sezioni:</span>
     <button class="btn btn-ghost" onclick="toggleAll(true)">⊞ Espandi tutto</button>
@@ -917,6 +989,16 @@ document.addEventListener('keydown', e => {
     if (active && active.tagName !== 'TEXTAREA') saveItem();
   }
 });
+
+// ─────────────────────────────────────────────
+//  SETTINGS PANEL
+// ─────────────────────────────────────────────
+function toggleSettingsPanel() {
+  const card = document.getElementById('settingsCard');
+  const gear = document.getElementById('settingsGearBtn');
+  const isOpen = card.classList.toggle('open');
+  gear.classList.toggle('active', isOpen);
+}
 
 // ─────────────────────────────────────────────
 //  INIT
