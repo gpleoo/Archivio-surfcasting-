@@ -506,7 +506,15 @@
       .section-body-inner { padding: .2rem .85rem 1rem; }
       .section-icon { font-size: 1.3rem; }
       .section-title { font-size: 1rem; }
-      .gear-dropdown { min-width: 230px; }
+      .gear-dropdown {
+        min-width: 230px;
+        position: fixed; top: auto;
+        bottom: calc(env(safe-area-inset-bottom) + .5rem);
+        right: .75rem; left: .75rem;
+        width: auto; max-width: 100%;
+        max-height: calc(100dvh - 6rem); overflow-y: auto;
+        border-radius: var(--radius-lg);
+      }
       .partner-tabs { overflow-x: auto; flex-wrap: nowrap; }
       .partner-tab { white-space: nowrap; flex-shrink: 0; padding: .55rem .8rem; font-size: .82rem; }
     }
@@ -536,12 +544,6 @@
       .modal-header, .modal-footer { padding: .85rem 1.1rem; }
       .modal-footer { gap: .5rem; }
       .modal-footer .btn { flex: 1; justify-content: center; min-height: 44px; }
-      .gear-dropdown {
-        position: fixed; top: auto; bottom: calc(env(safe-area-inset-bottom) + .5rem);
-        right: .75rem; left: .75rem; min-width: unset; width: auto;
-        max-width: 100%;
-        max-height: calc(100dvh - 6rem); overflow-y: auto;
-      }
     }
 
     /* ── SMALL PHONE (≤ 360px) ── */
