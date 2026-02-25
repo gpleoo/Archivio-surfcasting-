@@ -540,6 +540,7 @@
         position: fixed; top: auto; bottom: calc(env(safe-area-inset-bottom) + .5rem);
         right: .75rem; left: .75rem; min-width: unset; width: auto;
         max-width: 100%;
+        max-height: calc(100dvh - 6rem); overflow-y: auto;
       }
     }
 
@@ -685,11 +686,12 @@
       <button class="modal-close" onclick="closePartnerModal()">✕</button>
     </div>
     <div class="modal-body">
+      <div class="partner-banner" id="partnerBanner">Gestisci i tuoi contatti: negozi, associazioni e maestri di pesca</div>
       <!-- TABS -->
       <div class="partner-tabs">
-        <button class="partner-tab active" onclick="switchPartnerTab('negozi',this)">🏪 Negozi di pesca</button>
-        <button class="partner-tab" onclick="switchPartnerTab('associazioni',this)">🏅 Associazioni</button>
-        <button class="partner-tab" onclick="switchPartnerTab('maestri',this)">🎓 Maestri di pesca</button>
+        <button class="partner-tab active" id="tab-negozi" onclick="switchPartnerTab('negozi',this)">🏪 <span class="tab-label">Negozi di pesca</span> <span class="tab-count" id="count-negozi"></span></button>
+        <button class="partner-tab" id="tab-associazioni" onclick="switchPartnerTab('associazioni',this)">🏅 <span class="tab-label">Associazioni</span> <span class="tab-count" id="count-associazioni"></span></button>
+        <button class="partner-tab" id="tab-maestri" onclick="switchPartnerTab('maestri',this)">🎓 <span class="tab-label">Maestri di pesca</span> <span class="tab-count" id="count-maestri"></span></button>
       </div>
       <!-- PANEL NEGOZI -->
       <div class="partner-panel active" id="panel-negozi">
@@ -1037,11 +1039,11 @@ function importData(event) {
 }
 
 function confirmClearAll() {
-  if (confirm('Sei sicuro di voler eliminare TUTTI i dati? Questa azione non è reversibile.')) {
+  if (confirm(t('reset_confirm'))) {
     state = { sections: JSON.parse(JSON.stringify(DEFAULTS)) };
     saveData(true);
     renderAll();
-    showToast('Archivio svuotato', 'success');
+    showToast(t('reset_done'), 'success');
     closeGearDropdown();
   }
 }
@@ -1071,13 +1073,14 @@ function renderSection(s) {
   const hdr = document.createElement('div');
   hdr.className = 'section-header';
   hdr.onclick = () => toggleSection(s.id);
+  const sectionName = t('section_' + s.id) || s.name;
   hdr.innerHTML = `
     <span class="section-icon">${s.icon}</span>
-    <span class="section-title">${esc(s.name)}</span>
+    <span class="section-title">${esc(sectionName)}</span>
     <span class="section-badge">${filteredItems.length}${q && filteredItems.length !== s.items.length ? '/'+s.items.length : ''}</span>
     <div class="section-header-actions" onclick="event.stopPropagation()">
-      <button class="btn btn-ghost btn-add-item" onclick="openItemModal('${s.id}')" title="Aggiungi elemento"><span class="btn-label">+ Aggiungi</span></button>
-      <button class="btn btn-ghost btn-open-fields" onclick="openFieldsModal('${s.id}')" title="Gestisci campi"><span class="btn-label">⚙ Campi</span></button>
+      <button class="btn btn-ghost btn-add-item" onclick="openItemModal('${s.id}')" title="${t('add')}"><span class="btn-label">${t('add')}</span></button>
+      <button class="btn btn-ghost btn-open-fields" onclick="openFieldsModal('${s.id}')" title="${t('fields')}"><span class="btn-label">${t('fields')}</span></button>
     </div>
     <span class="chevron">▼</span>
   `;
@@ -1096,11 +1099,11 @@ function renderSection(s) {
 
   let thead = `<thead><tr>`;
   visibleFields.forEach(f => { thead += `<th>${esc(f.label)}</th>`; });
-  thead += `<th>Note</th><th style="width:80px"></th></tr></thead>`;
+  thead += `<th>${t('note')}</th><th style="width:80px"></th></tr></thead>`;
 
   let tbody = `<tbody>`;
   if (filteredItems.length === 0) {
-    tbody += `<tr class="empty-row"><td colspan="${visibleFields.length + 2}">Nessun elemento. Usa "+ Aggiungi" per iniziare.</td></tr>`;
+    tbody += `<tr class="empty-row"><td colspan="${visibleFields.length + 2}">${t('empty_msg')}</td></tr>`;
   } else {
     filteredItems.forEach(item => {
       const qtyMin = Number(item.quantita_min) || 0;
@@ -1110,7 +1113,7 @@ function renderSection(s) {
       visibleFields.forEach(f => {
         const val = item[f.key] !== undefined ? String(item[f.key]) : '—';
         if (f.key === 'quantita' && isLow) {
-          tbody += `<td>${highlight(esc(val), q)} <span class="low-stock-badge">Scorta bassa</span></td>`;
+          tbody += `<td>${highlight(esc(val), q)} <span class="low-stock-badge">${t('low_stock')}</span></td>`;
         } else {
           tbody += `<td>${highlight(esc(val), q)}</td>`;
         }
@@ -1135,7 +1138,7 @@ function renderSection(s) {
   const cardList = document.createElement('div');
   cardList.className = 'mobile-card-list';
   if (filteredItems.length === 0) {
-    cardList.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:2rem 1rem;font-style:italic;font-size:.9rem">Nessun elemento. Usa "+ Aggiungi" per iniziare.</p>`;
+    cardList.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:2rem 1rem;font-style:italic;font-size:.9rem">${t('empty_msg')}</p>`;
   } else {
     filteredItems.forEach(item => {
       const qtyMin = Number(item.quantita_min) || 0;
@@ -1392,6 +1395,7 @@ document.addEventListener('keydown', e => {
     closeItemModal();
     closeFieldsModal();
     closePartnerModal();
+    closePrivacyModal();
   }
   // Ctrl/Cmd + F → focus search
   if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
@@ -1497,14 +1501,31 @@ function deletePartner(cat, id) {
 
 function renderPartnerLists() {
   ['negozi','associazioni','maestri'].forEach(renderPartnerList);
+  updatePartnerCounts();
 }
+
+function updatePartnerCounts() {
+  const data = loadPartners();
+  ['negozi','associazioni','maestri'].forEach(cat => {
+    const countEl = document.getElementById('count-' + cat);
+    if (countEl) {
+      const n = (data[cat] || []).length;
+      countEl.textContent = n > 0 ? `(${n})` : '';
+    }
+  });
+  // Aggiorna banner
+  const banner = document.getElementById('partnerBanner');
+  if (banner) banner.textContent = t('partner_banner');
+}
+
+const PARTNER_ICONS = { negozi: '🏪', associazioni: '🏅', maestri: '🎓' };
 
 function renderPartnerList(cat) {
   const data  = loadPartners();
   const list  = document.getElementById('list-' + cat);
   const items = data[cat] || [];
   if (items.length === 0) {
-    list.innerHTML = '<div class="partner-empty">Nessun elemento. Usa "+ Aggiungi" per iniziare.</div>';
+    list.innerHTML = `<div class="partner-empty">${t('empty_msg')}</div>`;
     return;
   }
   list.innerHTML = items.map(e => {
@@ -1518,16 +1539,18 @@ function renderPartnerList(cat) {
       e.note   ? `<em>${esc(e.note)}</em>` : '',
     ].filter(Boolean).join(' · ');
     return `<div class="partner-entry">
-      <div class="partner-entry-info">
+      <span class="partner-icon-circle ${cat}">${PARTNER_ICONS[cat] || ''}</span>
+      <div class="partner-entry-info" style="flex:1">
         <div class="partner-entry-name">${esc(e.nome)}</div>
         ${details ? `<div class="partner-entry-details">${details}</div>` : ''}
       </div>
       <div class="partner-entry-actions">
-        <button onclick="openPartnerForm('${cat}','${e.id}')" title="Modifica">✏️</button>
-        <button class="btn-del-p" onclick="deletePartner('${cat}','${e.id}')" title="Elimina">🗑️</button>
+        <button onclick="openPartnerForm('${cat}','${e.id}')" title="${t('edit_title')}">✏️</button>
+        <button class="btn-del-p" onclick="deletePartner('${cat}','${e.id}')" title="${t('delete_confirm')}">🗑️</button>
       </div>
     </div>`;
   }).join('');
+  updatePartnerCounts();
 }
 
 // ─────────────────────────────────────────────
