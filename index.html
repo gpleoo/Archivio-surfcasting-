@@ -435,7 +435,7 @@
       gap: .5rem; padding: .2rem 0;
       border-bottom: 1px solid rgba(255,255,255,.04);
     }
-    .mobile-card-row:last-of-type { border-bottom: none; }
+    .mobile-card-row:nth-last-child(2) { border-bottom: none; }
     .mobile-card-key {
       font-size: .75rem; font-weight: 700; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0;
@@ -875,6 +875,13 @@ function loadData() {
       DEFAULTS.forEach(def => {
         if (!ids.includes(def.id)) saved.sections.push(JSON.parse(JSON.stringify(def)));
       });
+      // Riordina secondo l'ordine dei DEFAULTS (le sezioni custom vanno in fondo)
+      const defOrder = DEFAULTS.map(d => d.id);
+      saved.sections.sort((a, b) => {
+        const ia = defOrder.indexOf(a.id);
+        const ib = defOrder.indexOf(b.id);
+        return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+      });
       state = saved;
     } else {
       state = { sections: JSON.parse(JSON.stringify(DEFAULTS)) };
@@ -884,10 +891,10 @@ function loadData() {
   }
 }
 
-function saveData() {
+function saveData(silent = false) {
   try {
     localStorage.setItem('surfcasting_data', JSON.stringify(state));
-    showToast('Salvato ✓', 'success');
+    if (!silent) showToast('Salvato ✓', 'success');
   } catch(e) {
     showToast('Errore nel salvataggio!', 'error');
   }
@@ -905,6 +912,7 @@ function exportData() {
   a.click();
   URL.revokeObjectURL(url);
   showToast('Esportazione completata', 'success');
+  closeGearDropdown();
 }
 
 function importData(event) {
@@ -917,13 +925,14 @@ function importData(event) {
       if (!imported.sections || !Array.isArray(imported.sections))
         throw new Error('Formato non valido');
       state = imported;
-      saveData();
+      saveData(true);
       renderAll();
       showToast('Importazione completata ✓', 'success');
     } catch(err) {
       showToast('File JSON non valido!', 'error');
     }
     event.target.value = '';
+    closeGearDropdown();
   };
   reader.readAsText(file);
 }
@@ -931,9 +940,10 @@ function importData(event) {
 function confirmClearAll() {
   if (confirm('Sei sicuro di voler eliminare TUTTI i dati? Questa azione non è reversibile.')) {
     state = { sections: JSON.parse(JSON.stringify(DEFAULTS)) };
-    saveData();
+    saveData(true);
     renderAll();
     showToast('Archivio svuotato', 'success');
+    closeGearDropdown();
   }
 }
 
@@ -1073,6 +1083,7 @@ function toggleSection(id) {
     if (s.collapsed) card.classList.remove('open');
     else card.classList.add('open');
   }
+  saveData(true);
 }
 
 function toggleAll(expand) {
@@ -1081,6 +1092,7 @@ function toggleAll(expand) {
     if (expand) card.classList.add('open');
     else card.classList.remove('open');
   });
+  saveData(true);
 }
 
 // ─────────────────────────────────────────────
@@ -1150,7 +1162,7 @@ function saveItem() {
   if (!_editItemId) s.items.push(item);
 
   saveData();
-  document.getElementById('itemModal').style.display = 'none';
+  closeItemModal();
   rerenderSection(s.id);
 }
 
@@ -1268,9 +1280,9 @@ function showToast(msg, type = 'success') {
 // ─────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    document.getElementById('itemModal').style.display    = 'none';
-    document.getElementById('fieldsModal').style.display  = 'none';
-    document.getElementById('partnerModal').style.display = 'none';
+    closeItemModal();
+    closeFieldsModal();
+    closePartnerModal();
   }
   // Ctrl/Cmd + F → focus search
   if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
@@ -1417,6 +1429,11 @@ function toggleSettingsPanel() {
   const gear = document.getElementById('settingsGearBtn');
   const isOpen = drop.classList.toggle('open');
   gear.classList.toggle('active', isOpen);
+}
+
+function closeGearDropdown() {
+  document.getElementById('gearDropdown').classList.remove('open');
+  document.getElementById('settingsGearBtn').classList.remove('active');
 }
 
 // Chiudi il dropdown cliccando fuori
