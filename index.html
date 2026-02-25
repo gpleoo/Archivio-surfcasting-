@@ -322,7 +322,7 @@
 
     .gear-dropdown {
       display: none;
-      position: absolute; top: calc(100% + .6rem); right: 0;
+      position: fixed; top: 3.5rem; right: 1.5rem;
       min-width: 260px;
       background: var(--surface);
       border: 1px solid var(--border-light);
@@ -508,12 +508,11 @@
       .section-title { font-size: 1rem; }
       .gear-dropdown {
         min-width: 230px;
-        position: fixed; top: auto;
+        top: auto;
         bottom: calc(env(safe-area-inset-bottom) + .5rem);
         right: .75rem; left: .75rem;
         width: auto; max-width: 100%;
         max-height: calc(100dvh - 6rem); overflow-y: auto;
-        border-radius: var(--radius-lg);
       }
       .partner-tabs { overflow-x: auto; flex-wrap: nowrap; }
       .partner-tab { white-space: nowrap; flex-shrink: 0; padding: .55rem .8rem; font-size: .82rem; }
@@ -598,29 +597,31 @@
   <div class="navbar-actions">
     <div class="gear-wrapper">
       <button class="btn-settings-gear" id="settingsGearBtn" onclick="toggleSettingsPanel()" title="Dati">⚙</button>
-      <div class="gear-dropdown" id="gearDropdown">
-        <div class="gear-dropdown-title">Gestione</div>
-        <div class="gear-dropdown-actions">
-          <button class="btn btn-ghost" onclick="openPartnerModal();toggleSettingsPanel()">🤝&nbsp; Partner &amp; Sponsor</button>
-        </div>
-        <div class="gear-dropdown-title" style="margin-top:.25rem">Impostazioni</div>
-        <div class="gear-dropdown-actions">
-          <button class="btn btn-ghost" onclick="openPrivacyModal();toggleSettingsPanel()">🔒&nbsp; Privacy Policy</button>
-          <button class="btn btn-ghost" onclick="cycleLang()">🌐&nbsp; Lingua: <span id="langLabel">IT</span></button>
-        </div>
-        <div class="gear-dropdown-title" style="margin-top:.25rem">Dati</div>
-        <div class="gear-dropdown-actions">
-          <button class="btn btn-ghost" onclick="exportData()">⬇&nbsp; Esporta archivio</button>
-          <label class="btn btn-ghost" style="cursor:pointer">
-            ⬆&nbsp; Importa archivio
-            <input type="file" accept=".json" style="display:none" onchange="importData(event)" />
-          </label>
-          <button class="btn btn-danger" onclick="confirmClearAll()">🗑&nbsp; Reset completo</button>
-        </div>
-      </div>
     </div>
   </div>
 </nav>
+
+<!-- ── GEAR DROPDOWN (fuori dalla navbar per evitare il containing block di backdrop-filter) ── -->
+<div class="gear-dropdown" id="gearDropdown">
+  <div class="gear-dropdown-title">Gestione</div>
+  <div class="gear-dropdown-actions">
+    <button class="btn btn-ghost" onclick="openPartnerModal();toggleSettingsPanel()">🤝&nbsp; Partner &amp; Sponsor</button>
+  </div>
+  <div class="gear-dropdown-title" style="margin-top:.25rem">Impostazioni</div>
+  <div class="gear-dropdown-actions">
+    <button class="btn btn-ghost" onclick="openPrivacyModal();toggleSettingsPanel()">🔒&nbsp; Privacy Policy</button>
+    <button class="btn btn-ghost" onclick="cycleLang()">🌐&nbsp; Lingua: <span id="langLabel">IT</span></button>
+  </div>
+  <div class="gear-dropdown-title" style="margin-top:.25rem">Dati</div>
+  <div class="gear-dropdown-actions">
+    <button class="btn btn-ghost" onclick="exportData()">⬇&nbsp; Esporta archivio</button>
+    <label class="btn btn-ghost" style="cursor:pointer">
+      ⬆&nbsp; Importa archivio
+      <input type="file" accept=".json" style="display:none" onchange="importData(event)" />
+    </label>
+    <button class="btn btn-danger" onclick="confirmClearAll()">🗑&nbsp; Reset completo</button>
+  </div>
+</div>
 
 <!-- ── MAIN ── -->
 <div class="main">
@@ -1573,8 +1574,9 @@ function closeGearDropdown() {
 // Chiudi il dropdown cliccando fuori
 document.addEventListener('click', e => {
   const wrapper = document.querySelector('.gear-wrapper');
-  if (wrapper && !wrapper.contains(e.target)) {
-    document.getElementById('gearDropdown').classList.remove('open');
+  const dropdown = document.getElementById('gearDropdown');
+  if (wrapper && !wrapper.contains(e.target) && dropdown && !dropdown.contains(e.target)) {
+    dropdown.classList.remove('open');
     document.getElementById('settingsGearBtn').classList.remove('active');
   }
 });
