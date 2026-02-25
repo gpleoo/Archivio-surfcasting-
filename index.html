@@ -457,6 +457,40 @@
       th, td { padding: .65rem .85rem; }
     }
 
+    /* ── SCORTE BASSE ── */
+    .low-stock-badge {
+      background: rgba(248,113,113,.12); color: var(--danger);
+      font-size: .75rem; font-weight: 700; padding: .15rem .5rem;
+      border-radius: 12px; white-space: nowrap; display: inline-block; margin-left: .35rem;
+    }
+    tr.low-stock td { background: rgba(248,113,113,.06) !important; }
+    .mobile-card.low-stock { border-color: rgba(248,113,113,.35); }
+
+    /* ── COOKIE BANNER ── */
+    .cookie-banner {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
+      background: var(--surface); border-top: 1px solid var(--border-light);
+      padding: 1.25rem; box-shadow: 0 -4px 24px rgba(0,0,0,.5);
+    }
+    .cookie-content { max-width: 700px; margin: 0 auto; text-align: center; }
+    .cookie-content p { margin-bottom: .5rem; font-size: .9rem; color: var(--text-secondary); }
+    .cookie-actions { display: flex; gap: .75rem; justify-content: center; margin-top: .75rem; }
+
+    /* ── PARTNER RESTYLE ── */
+    .partner-banner {
+      padding: .75rem 1rem; background: var(--surface-2); border-radius: var(--radius);
+      margin-bottom: 1rem; font-size: .85rem; color: var(--text-secondary); text-align: center;
+    }
+    .partner-icon-circle {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0; margin-right: .6rem;
+    }
+    .partner-icon-circle.negozi { background: rgba(91,164,245,.15); }
+    .partner-icon-circle.associazioni { background: rgba(74,222,128,.15); }
+    .partner-icon-circle.maestri { background: rgba(240,180,41,.15); }
+    .partner-entry { display: flex; align-items: center; }
+
     /* ── PHABLET (≤ 680px) ── */
     @media (max-width: 680px) {
       html { font-size: 15px; }
@@ -506,6 +540,7 @@
         position: fixed; top: auto; bottom: calc(env(safe-area-inset-bottom) + .5rem);
         right: .75rem; left: .75rem; min-width: unset; width: auto;
         max-width: 100%;
+        max-height: calc(100dvh - 6rem); overflow-y: auto;
       }
     }
 
@@ -536,6 +571,18 @@
 </head>
 <body>
 
+<!-- ── COOKIE BANNER ── -->
+<div id="cookieBanner" class="cookie-banner" style="display:none">
+  <div class="cookie-content">
+    <p><strong>Cookie &amp; Privacy</strong></p>
+    <p>Questa app utilizza localStorage per salvare i tuoi dati localmente sul dispositivo. Nessun dato viene inviato a server esterni.</p>
+    <div class="cookie-actions">
+      <button class="btn btn-accent" onclick="acceptCookies()">Accetto</button>
+      <button class="btn btn-ghost" onclick="openPrivacyModal()">Leggi la Privacy Policy</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── NAVBAR ── -->
 <nav class="navbar">
   <div class="navbar-brand">
@@ -553,6 +600,11 @@
         <div class="gear-dropdown-title">Gestione</div>
         <div class="gear-dropdown-actions">
           <button class="btn btn-ghost" onclick="openPartnerModal();toggleSettingsPanel()">🤝&nbsp; Partner &amp; Sponsor</button>
+        </div>
+        <div class="gear-dropdown-title" style="margin-top:.25rem">Impostazioni</div>
+        <div class="gear-dropdown-actions">
+          <button class="btn btn-ghost" onclick="openPrivacyModal();toggleSettingsPanel()">🔒&nbsp; Privacy Policy</button>
+          <button class="btn btn-ghost" onclick="cycleLang()">🌐&nbsp; Lingua: <span id="langLabel">IT</span></button>
         </div>
         <div class="gear-dropdown-title" style="margin-top:.25rem">Dati</div>
         <div class="gear-dropdown-actions">
@@ -634,11 +686,12 @@
       <button class="modal-close" onclick="closePartnerModal()">✕</button>
     </div>
     <div class="modal-body">
+      <div class="partner-banner" id="partnerBanner">Gestisci i tuoi contatti: negozi, associazioni e maestri di pesca</div>
       <!-- TABS -->
       <div class="partner-tabs">
-        <button class="partner-tab active" onclick="switchPartnerTab('negozi',this)">🏪 Negozi di pesca</button>
-        <button class="partner-tab" onclick="switchPartnerTab('associazioni',this)">🏅 Associazioni</button>
-        <button class="partner-tab" onclick="switchPartnerTab('maestri',this)">🎓 Maestri di pesca</button>
+        <button class="partner-tab active" id="tab-negozi" onclick="switchPartnerTab('negozi',this)">🏪 <span class="tab-label">Negozi di pesca</span> <span class="tab-count" id="count-negozi"></span></button>
+        <button class="partner-tab" id="tab-associazioni" onclick="switchPartnerTab('associazioni',this)">🏅 <span class="tab-label">Associazioni</span> <span class="tab-count" id="count-associazioni"></span></button>
+        <button class="partner-tab" id="tab-maestri" onclick="switchPartnerTab('maestri',this)">🎓 <span class="tab-label">Maestri di pesca</span> <span class="tab-count" id="count-maestri"></span></button>
       </div>
       <!-- PANEL NEGOZI -->
       <div class="partner-panel active" id="panel-negozi">
@@ -703,6 +756,34 @@
   </div>
 </div>
 
+<!-- ── MODAL PRIVACY ── -->
+<div id="privacyModal" class="modal-backdrop" style="display:none" onclick="closePrivacyModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>🔒 Privacy Policy</h3>
+      <button class="modal-close" onclick="closePrivacyModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <h4 style="margin-bottom:.75rem">Informativa sulla Privacy</h4>
+      <p style="margin-bottom:.5rem;color:var(--text-secondary);font-size:.9rem">
+        <strong>Archivio Surfcasting</strong> è un'applicazione che funziona interamente nel tuo browser.
+      </p>
+      <ul style="margin:.75rem 0;padding-left:1.2rem;color:var(--text-secondary);font-size:.9rem;line-height:1.7">
+        <li><strong>Dati locali:</strong> Tutti i dati sono salvati in localStorage sul tuo dispositivo.</li>
+        <li><strong>Nessun server:</strong> Nessun dato viene trasmesso a server esterni.</li>
+        <li><strong>Nessun tracciamento:</strong> Non utilizziamo cookie di profilazione né analytics.</li>
+        <li><strong>Cancellazione:</strong> Puoi eliminare tutti i dati in qualsiasi momento con "Reset completo".</li>
+      </ul>
+      <p style="margin-top:.75rem;color:var(--text-muted);font-size:.82rem">
+        Ultimo aggiornamento: febbraio 2026
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closePrivacyModal()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─────────────────────────────────────────────
 //  DATA DEFINITIONS
@@ -712,12 +793,14 @@ const DEFAULTS = [
     id: 'travi',
     name: 'Travi',
     icon: '🔩',
-    collapsed: false,
+    collapsed: true,
     fields: [
-      { key: 'numero',   label: 'Numero',       type: 'number', required: true,  custom: false },
-      { key: 'misura',   label: 'Misura',        type: 'text',   required: false, custom: false, placeholder: 'es. 3x100' },
-      { key: 'diam_filo',label: 'Ø Filo (mm)',   type: 'text',   required: false, custom: false, placeholder: 'es. 0.35' },
-      { key: 'note',     label: 'Note',          type: 'textarea',required: false,custom: false },
+      { key: 'numero',      label: 'Numero',        type: 'number',  required: true,  custom: false },
+      { key: 'misura',      label: 'Misura',         type: 'text',    required: false, custom: false, placeholder: 'es. 3x100' },
+      { key: 'diam_filo',   label: 'Ø Filo (mm)',    type: 'text',    required: false, custom: false, placeholder: 'es. 0.35' },
+      { key: 'quantita',    label: 'Quantità',       type: 'number',  required: false, custom: false },
+      { key: 'quantita_min',label: 'Scorta minima',  type: 'number',  required: false, custom: false, placeholder: 'Scorta minima' },
+      { key: 'note',        label: 'Note',           type: 'textarea',required: false, custom: false },
     ],
     items: []
   },
@@ -725,14 +808,16 @@ const DEFAULTS = [
     id: 'terminali',
     name: 'Terminali',
     icon: '🪝',
-    collapsed: false,
+    collapsed: true,
     fields: [
-      { key: 'n_ami',     label: 'N° Ami',           type: 'number', required: true,  custom: false },
-      { key: 'misura_amo',label: 'Misura Amo',        type: 'text',   required: false, custom: false, placeholder: 'es. 2, 1/0' },
-      { key: 'marca_amo', label: 'Marca Amo',         type: 'text',   required: false, custom: false },
-      { key: 'diam_filo', label: 'Ø Filo (mm)',       type: 'text',   required: false, custom: false, placeholder: 'es. 0.30' },
-      { key: 'lung_filo', label: 'Lunghezza Filo (cm)',type: 'number', required: false, custom: false },
-      { key: 'note',      label: 'Note',              type: 'textarea',required: false,custom: false },
+      { key: 'n_ami',       label: 'N° Ami',            type: 'number',  required: true,  custom: false },
+      { key: 'misura_amo',  label: 'Misura Amo',         type: 'text',    required: false, custom: false, placeholder: 'es. 2, 1/0' },
+      { key: 'marca_amo',   label: 'Marca Amo',          type: 'text',    required: false, custom: false },
+      { key: 'diam_filo',   label: 'Ø Filo (mm)',        type: 'text',    required: false, custom: false, placeholder: 'es. 0.30' },
+      { key: 'lung_filo',   label: 'Lunghezza Filo (cm)',type: 'number',  required: false, custom: false },
+      { key: 'quantita',    label: 'Quantità',           type: 'number',  required: false, custom: false },
+      { key: 'quantita_min',label: 'Scorta minima',      type: 'number',  required: false, custom: false, placeholder: 'Scorta minima' },
+      { key: 'note',        label: 'Note',               type: 'textarea',required: false, custom: false },
     ],
     items: []
   },
@@ -742,10 +827,11 @@ const DEFAULTS = [
     icon: '⚓',
     collapsed: true,
     fields: [
-      { key: 'tipo',      label: 'Tipo',        type: 'text',   required: true,  custom: false, placeholder: 'es. Arpa, Fisso, Scorrevole' },
-      { key: 'peso',      label: 'Peso (g)',     type: 'number', required: false, custom: false },
-      { key: 'quantita',  label: 'Quantità',     type: 'number', required: false, custom: false },
-      { key: 'note',      label: 'Note',         type: 'textarea',required: false,custom: false },
+      { key: 'tipo',        label: 'Tipo',           type: 'text',    required: true,  custom: false, placeholder: 'es. Arpa, Fisso, Scorrevole' },
+      { key: 'peso',        label: 'Peso (g)',        type: 'number',  required: false, custom: false },
+      { key: 'quantita',    label: 'Quantità',        type: 'number',  required: false, custom: false },
+      { key: 'quantita_min',label: 'Scorta minima',   type: 'number',  required: false, custom: false, placeholder: 'Scorta minima' },
+      { key: 'note',        label: 'Note',            type: 'textarea',required: false, custom: false },
     ],
     items: []
   },
@@ -755,56 +841,14 @@ const DEFAULTS = [
     icon: '🧵',
     collapsed: true,
     fields: [
-      { key: 'marca',     label: 'Marca',        type: 'text',   required: true,  custom: false },
-      { key: 'tipo',      label: 'Tipo',         type: 'text',   required: false, custom: false, placeholder: 'Mono / Treccia / Fluoro' },
-      { key: 'diam',      label: 'Ø (mm)',        type: 'text',   required: false, custom: false },
-      { key: 'lunghezza', label: 'Lunghezza (m)', type: 'number', required: false, custom: false },
-      { key: 'colore',    label: 'Colore',        type: 'text',   required: false, custom: false },
-      { key: 'note',      label: 'Note',          type: 'textarea',required: false,custom: false },
-    ],
-    items: []
-  },
-  {
-    id: 'shock',
-    name: 'Shock Leader',
-    icon: '💪',
-    collapsed: true,
-    fields: [
-      { key: 'marca',     label: 'Marca',        type: 'text',   required: true,  custom: false },
-      { key: 'materiale', label: 'Materiale',    type: 'text',   required: false, custom: false, placeholder: 'Nylon / Fluoro' },
-      { key: 'diam',      label: 'Ø (mm)',        type: 'text',   required: false, custom: false },
-      { key: 'lunghezza', label: 'Lunghezza (m)', type: 'number', required: false, custom: false },
-      { key: 'note',      label: 'Note',          type: 'textarea',required: false,custom: false },
-    ],
-    items: []
-  },
-  {
-    id: 'mulinelli',
-    name: 'Mulinelli',
-    icon: '🎛️',
-    collapsed: true,
-    fields: [
-      { key: 'marca',     label: 'Marca',           type: 'text',   required: true,  custom: false },
-      { key: 'modello',   label: 'Modello',         type: 'text',   required: false, custom: false },
-      { key: 'rapporto',  label: 'Rapporto',        type: 'text',   required: false, custom: false, placeholder: 'es. 5.2:1' },
-      { key: 'capacita',  label: 'Capacità filo',   type: 'text',   required: false, custom: false, placeholder: 'es. 200m 0.30' },
-      { key: 'stato',     label: 'Stato',           type: 'text',   required: false, custom: false, placeholder: 'Ottimo / Buono / Da revisionare' },
-      { key: 'note',      label: 'Note',            type: 'textarea',required: false,custom: false },
-    ],
-    items: []
-  },
-  {
-    id: 'canne',
-    name: 'Canne',
-    icon: '🎣',
-    collapsed: true,
-    fields: [
-      { key: 'marca',     label: 'Marca',           type: 'text',   required: true,  custom: false },
-      { key: 'modello',   label: 'Modello',         type: 'text',   required: false, custom: false },
-      { key: 'lunghezza', label: 'Lunghezza (m)',    type: 'text',   required: false, custom: false, placeholder: 'es. 4.20' },
-      { key: 'potenza',   label: 'Potenza (g)',      type: 'text',   required: false, custom: false, placeholder: 'es. 40-150' },
-      { key: 'stato',     label: 'Stato',           type: 'text',   required: false, custom: false, placeholder: 'Ottimo / Buono / Da riparare' },
-      { key: 'note',      label: 'Note',            type: 'textarea',required: false,custom: false },
+      { key: 'marca',       label: 'Marca',          type: 'text',    required: true,  custom: false },
+      { key: 'tipo',        label: 'Tipo',           type: 'text',    required: false, custom: false, placeholder: 'Mono / Treccia / Fluoro' },
+      { key: 'diam',        label: 'Ø (mm)',          type: 'text',    required: false, custom: false },
+      { key: 'lunghezza',   label: 'Lunghezza (m)',   type: 'number',  required: false, custom: false },
+      { key: 'colore',      label: 'Colore',          type: 'text',    required: false, custom: false },
+      { key: 'quantita',    label: 'Quantità',        type: 'number',  required: false, custom: false },
+      { key: 'quantita_min',label: 'Scorta minima',   type: 'number',  required: false, custom: false, placeholder: 'Scorta minima' },
+      { key: 'note',        label: 'Note',            type: 'textarea',required: false, custom: false },
     ],
     items: []
   },
@@ -814,11 +858,41 @@ const DEFAULTS = [
     icon: '🪝',
     collapsed: true,
     fields: [
-      { key: 'marca',     label: 'Marca',    type: 'text',   required: true,  custom: false },
-      { key: 'misura',    label: 'Misura',   type: 'text',   required: false, custom: false, placeholder: 'es. 2, 1/0, 4/0' },
-      { key: 'tipo',      label: 'Tipo',     type: 'text',   required: false, custom: false, placeholder: 'es. Limerick, Aberdeen' },
-      { key: 'quantita',  label: 'Quantità', type: 'number', required: false, custom: false },
-      { key: 'note',      label: 'Note',     type: 'textarea',required: false,custom: false },
+      { key: 'marca',       label: 'Marca',          type: 'text',    required: true,  custom: false },
+      { key: 'misura',      label: 'Misura',         type: 'text',    required: false, custom: false, placeholder: 'es. 2, 1/0, 4/0' },
+      { key: 'tipo',        label: 'Tipo',           type: 'text',    required: false, custom: false, placeholder: 'es. Limerick, Aberdeen' },
+      { key: 'quantita',    label: 'Quantità',        type: 'number',  required: false, custom: false },
+      { key: 'quantita_min',label: 'Scorta minima',   type: 'number',  required: false, custom: false, placeholder: 'Scorta minima' },
+      { key: 'note',        label: 'Note',            type: 'textarea',required: false, custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'shock',
+    name: 'Shock Leader',
+    icon: '💪',
+    collapsed: true,
+    fields: [
+      { key: 'marca',       label: 'Marca',          type: 'text',    required: true,  custom: false },
+      { key: 'materiale',   label: 'Materiale',      type: 'text',    required: false, custom: false, placeholder: 'Nylon / Fluoro' },
+      { key: 'diam',        label: 'Ø (mm)',          type: 'text',    required: false, custom: false },
+      { key: 'lunghezza',   label: 'Lunghezza (m)',   type: 'number',  required: false, custom: false },
+      { key: 'note',        label: 'Note',            type: 'textarea',required: false, custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'mulinelli',
+    name: 'Mulinelli',
+    icon: '🎛️',
+    collapsed: true,
+    fields: [
+      { key: 'marca',       label: 'Marca',            type: 'text',    required: true,  custom: false },
+      { key: 'modello',     label: 'Modello',          type: 'text',    required: false, custom: false },
+      { key: 'rapporto',    label: 'Rapporto',         type: 'text',    required: false, custom: false, placeholder: 'es. 5.2:1' },
+      { key: 'capacita',    label: 'Capacità filo',    type: 'text',    required: false, custom: false, placeholder: 'es. 200m 0.30' },
+      { key: 'stato',       label: 'Stato',            type: 'text',    required: false, custom: false, placeholder: 'Ottimo / Buono / Da revisionare' },
+      { key: 'note',        label: 'Note',             type: 'textarea',required: false, custom: false },
     ],
     items: []
   },
@@ -828,13 +902,28 @@ const DEFAULTS = [
     icon: '🪡',
     collapsed: true,
     fields: [
-      { key: 'marca',       label: 'Marca',              type: 'text',     required: true,  custom: false },
-      { key: 'modello',     label: 'Modello',            type: 'text',     required: false, custom: false },
-      { key: 'tipo',        label: 'Tipo',               type: 'text',     required: false, custom: false, placeholder: 'es. Porta-filo, Extra, Spare' },
-      { key: 'capacita',    label: 'Capacità (m/mm)',    type: 'text',     required: false, custom: false, placeholder: 'es. 300m / 0.30' },
-      { key: 'compatibile', label: 'Compatibile con',   type: 'text',     required: false, custom: false, placeholder: 'es. Shimano Ultegra 14000' },
-      { key: 'stato',       label: 'Stato',              type: 'text',     required: false, custom: false, placeholder: 'Ottimo / Buono / Da revisionare' },
-      { key: 'note',        label: 'Note',               type: 'textarea', required: false, custom: false },
+      { key: 'marca',       label: 'Marca',            type: 'text',    required: true,  custom: false },
+      { key: 'modello',     label: 'Modello',          type: 'text',    required: false, custom: false },
+      { key: 'tipo',        label: 'Tipo',             type: 'text',    required: false, custom: false, placeholder: 'es. Porta-filo, Extra, Spare' },
+      { key: 'capacita',    label: 'Capacità (m/mm)',  type: 'text',    required: false, custom: false, placeholder: 'es. 300m / 0.30' },
+      { key: 'compatibile', label: 'Compatibile con',  type: 'text',    required: false, custom: false, placeholder: 'es. Shimano Ultegra 14000' },
+      { key: 'stato',       label: 'Stato',            type: 'text',    required: false, custom: false, placeholder: 'Ottimo / Buono / Da revisionare' },
+      { key: 'note',        label: 'Note',             type: 'textarea',required: false, custom: false },
+    ],
+    items: []
+  },
+  {
+    id: 'canne',
+    name: 'Canne',
+    icon: '🎣',
+    collapsed: true,
+    fields: [
+      { key: 'marca',       label: 'Marca',            type: 'text',    required: true,  custom: false },
+      { key: 'modello',     label: 'Modello',          type: 'text',    required: false, custom: false },
+      { key: 'lunghezza',   label: 'Lunghezza (m)',    type: 'text',    required: false, custom: false, placeholder: 'es. 4.20' },
+      { key: 'potenza',     label: 'Potenza (g)',      type: 'text',    required: false, custom: false, placeholder: 'es. 40-150' },
+      { key: 'stato',       label: 'Stato',            type: 'text',    required: false, custom: false, placeholder: 'Ottimo / Buono / Da riparare' },
+      { key: 'note',        label: 'Note',             type: 'textarea',required: false, custom: false },
     ],
     items: []
   },
@@ -844,10 +933,10 @@ const DEFAULTS = [
     icon: '🧰',
     collapsed: true,
     fields: [
-      { key: 'nome',      label: 'Nome',       type: 'text',   required: true,  custom: false },
-      { key: 'desc',      label: 'Descrizione',type: 'text',   required: false, custom: false },
-      { key: 'quantita',  label: 'Quantità',   type: 'number', required: false, custom: false },
-      { key: 'note',      label: 'Note',       type: 'textarea',required: false,custom: false },
+      { key: 'nome',        label: 'Nome',            type: 'text',    required: true,  custom: false },
+      { key: 'desc',        label: 'Descrizione',     type: 'text',    required: false, custom: false },
+      { key: 'quantita',    label: 'Quantità',         type: 'number',  required: false, custom: false },
+      { key: 'note',        label: 'Note',             type: 'textarea',required: false, custom: false },
     ],
     items: []
   },
@@ -874,6 +963,18 @@ function loadData() {
       const ids = saved.sections.map(s => s.id);
       DEFAULTS.forEach(def => {
         if (!ids.includes(def.id)) saved.sections.push(JSON.parse(JSON.stringify(def)));
+      });
+      // Merge nuovi campi predefiniti nelle sezioni esistenti
+      saved.sections.forEach(section => {
+        const def = DEFAULTS.find(d => d.id === section.id);
+        if (!def) return;
+        def.fields.forEach(defField => {
+          if (!defField.custom && !section.fields.find(f => f.key === defField.key)) {
+            const noteIdx = section.fields.findIndex(f => f.key === 'note');
+            if (noteIdx !== -1) section.fields.splice(noteIdx, 0, { ...defField });
+            else section.fields.push({ ...defField });
+          }
+        });
       });
       // Riordina secondo l'ordine dei DEFAULTS (le sezioni custom vanno in fondo)
       const defOrder = DEFAULTS.map(d => d.id);
@@ -938,11 +1039,11 @@ function importData(event) {
 }
 
 function confirmClearAll() {
-  if (confirm('Sei sicuro di voler eliminare TUTTI i dati? Questa azione non è reversibile.')) {
+  if (confirm(t('reset_confirm'))) {
     state = { sections: JSON.parse(JSON.stringify(DEFAULTS)) };
     saveData(true);
     renderAll();
-    showToast('Archivio svuotato', 'success');
+    showToast(t('reset_done'), 'success');
     closeGearDropdown();
   }
 }
@@ -972,13 +1073,14 @@ function renderSection(s) {
   const hdr = document.createElement('div');
   hdr.className = 'section-header';
   hdr.onclick = () => toggleSection(s.id);
+  const sectionName = t('section_' + s.id) || s.name;
   hdr.innerHTML = `
     <span class="section-icon">${s.icon}</span>
-    <span class="section-title">${esc(s.name)}</span>
+    <span class="section-title">${esc(sectionName)}</span>
     <span class="section-badge">${filteredItems.length}${q && filteredItems.length !== s.items.length ? '/'+s.items.length : ''}</span>
     <div class="section-header-actions" onclick="event.stopPropagation()">
-      <button class="btn btn-ghost btn-add-item" onclick="openItemModal('${s.id}')" title="Aggiungi elemento"><span class="btn-label">+ Aggiungi</span></button>
-      <button class="btn btn-ghost btn-open-fields" onclick="openFieldsModal('${s.id}')" title="Gestisci campi"><span class="btn-label">⚙ Campi</span></button>
+      <button class="btn btn-ghost btn-add-item" onclick="openItemModal('${s.id}')" title="${t('add')}"><span class="btn-label">${t('add')}</span></button>
+      <button class="btn btn-ghost btn-open-fields" onclick="openFieldsModal('${s.id}')" title="${t('fields')}"><span class="btn-label">${t('fields')}</span></button>
     </div>
     <span class="chevron">▼</span>
   `;
@@ -997,17 +1099,24 @@ function renderSection(s) {
 
   let thead = `<thead><tr>`;
   visibleFields.forEach(f => { thead += `<th>${esc(f.label)}</th>`; });
-  thead += `<th>Note</th><th style="width:80px"></th></tr></thead>`;
+  thead += `<th>${t('note')}</th><th style="width:80px"></th></tr></thead>`;
 
   let tbody = `<tbody>`;
   if (filteredItems.length === 0) {
-    tbody += `<tr class="empty-row"><td colspan="${visibleFields.length + 2}">Nessun elemento. Usa "+ Aggiungi" per iniziare.</td></tr>`;
+    tbody += `<tr class="empty-row"><td colspan="${visibleFields.length + 2}">${t('empty_msg')}</td></tr>`;
   } else {
     filteredItems.forEach(item => {
-      tbody += `<tr>`;
+      const qtyMin = Number(item.quantita_min) || 0;
+      const qty    = Number(item.quantita)     || 0;
+      const isLow  = qtyMin > 0 && qty <= qtyMin;
+      tbody += `<tr${isLow ? ' class="low-stock"' : ''}>`;
       visibleFields.forEach(f => {
         const val = item[f.key] !== undefined ? String(item[f.key]) : '—';
-        tbody += `<td>${highlight(esc(val), q)}</td>`;
+        if (f.key === 'quantita' && isLow) {
+          tbody += `<td>${highlight(esc(val), q)} <span class="low-stock-badge">${t('low_stock')}</span></td>`;
+        } else {
+          tbody += `<td>${highlight(esc(val), q)}</td>`;
+        }
       });
       // Note column
       const noteField = s.fields.find(f => f.key === 'note');
@@ -1029,11 +1138,14 @@ function renderSection(s) {
   const cardList = document.createElement('div');
   cardList.className = 'mobile-card-list';
   if (filteredItems.length === 0) {
-    cardList.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:2rem 1rem;font-style:italic;font-size:.9rem">Nessun elemento. Usa "+ Aggiungi" per iniziare.</p>`;
+    cardList.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:2rem 1rem;font-style:italic;font-size:.9rem">${t('empty_msg')}</p>`;
   } else {
     filteredItems.forEach(item => {
+      const qtyMin = Number(item.quantita_min) || 0;
+      const qty    = Number(item.quantita)     || 0;
+      const isLow  = qtyMin > 0 && qty <= qtyMin;
       const card = document.createElement('div');
-      card.className = 'mobile-card';
+      card.className = 'mobile-card' + (isLow ? ' low-stock' : '');
       let rows = '';
       s.fields.forEach(f => {
         const val = item[f.key] !== undefined && item[f.key] !== '' ? String(item[f.key]) : null;
@@ -1283,6 +1395,7 @@ document.addEventListener('keydown', e => {
     closeItemModal();
     closeFieldsModal();
     closePartnerModal();
+    closePrivacyModal();
   }
   // Ctrl/Cmd + F → focus search
   if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
@@ -1388,14 +1501,31 @@ function deletePartner(cat, id) {
 
 function renderPartnerLists() {
   ['negozi','associazioni','maestri'].forEach(renderPartnerList);
+  updatePartnerCounts();
 }
+
+function updatePartnerCounts() {
+  const data = loadPartners();
+  ['negozi','associazioni','maestri'].forEach(cat => {
+    const countEl = document.getElementById('count-' + cat);
+    if (countEl) {
+      const n = (data[cat] || []).length;
+      countEl.textContent = n > 0 ? `(${n})` : '';
+    }
+  });
+  // Aggiorna banner
+  const banner = document.getElementById('partnerBanner');
+  if (banner) banner.textContent = t('partner_banner');
+}
+
+const PARTNER_ICONS = { negozi: '🏪', associazioni: '🏅', maestri: '🎓' };
 
 function renderPartnerList(cat) {
   const data  = loadPartners();
   const list  = document.getElementById('list-' + cat);
   const items = data[cat] || [];
   if (items.length === 0) {
-    list.innerHTML = '<div class="partner-empty">Nessun elemento. Usa "+ Aggiungi" per iniziare.</div>';
+    list.innerHTML = `<div class="partner-empty">${t('empty_msg')}</div>`;
     return;
   }
   list.innerHTML = items.map(e => {
@@ -1409,16 +1539,18 @@ function renderPartnerList(cat) {
       e.note   ? `<em>${esc(e.note)}</em>` : '',
     ].filter(Boolean).join(' · ');
     return `<div class="partner-entry">
-      <div class="partner-entry-info">
+      <span class="partner-icon-circle ${cat}">${PARTNER_ICONS[cat] || ''}</span>
+      <div class="partner-entry-info" style="flex:1">
         <div class="partner-entry-name">${esc(e.nome)}</div>
         ${details ? `<div class="partner-entry-details">${details}</div>` : ''}
       </div>
       <div class="partner-entry-actions">
-        <button onclick="openPartnerForm('${cat}','${e.id}')" title="Modifica">✏️</button>
-        <button class="btn-del-p" onclick="deletePartner('${cat}','${e.id}')" title="Elimina">🗑️</button>
+        <button onclick="openPartnerForm('${cat}','${e.id}')" title="${t('edit_title')}">✏️</button>
+        <button class="btn-del-p" onclick="deletePartner('${cat}','${e.id}')" title="${t('delete_confirm')}">🗑️</button>
       </div>
     </div>`;
   }).join('');
+  updatePartnerCounts();
 }
 
 // ─────────────────────────────────────────────
@@ -1446,10 +1578,208 @@ document.addEventListener('click', e => {
 });
 
 // ─────────────────────────────────────────────
+//  TRANSLATIONS & LANGUAGE
+// ─────────────────────────────────────────────
+const TRANSLATIONS = {
+  IT: {
+    section_travi: 'Travi', section_terminali: 'Terminali', section_piombi: 'Piombi',
+    section_fili: 'Fili', section_ami: 'Ami', section_shock: 'Shock Leader',
+    section_mulinelli: 'Mulinelli', section_bobbine: 'Bobbine', section_canne: 'Canne',
+    section_accessori: 'Accessori',
+    add: '+ Aggiungi', fields: '⚙ Campi',
+    add_title: 'Aggiungi elemento', edit_title: 'Modifica',
+    save: 'Salva', cancel: 'Annulla', close: 'Chiudi', delete_confirm: 'Eliminare questo elemento?',
+    expand_all: '⊞ Espandi tutto', collapse_all: '⊟ Collassa tutto',
+    search_placeholder: 'Cerca in tutto l\'archivio…',
+    empty_msg: 'Nessun elemento. Usa "+ Aggiungi" per iniziare.',
+    saved: 'Salvato ✓', save_error: 'Errore nel salvataggio!',
+    exported: 'Archivio esportato ✓', imported: 'Importato ✓',
+    import_error: 'File non valido.', reset_confirm: 'Eliminare TUTTI i dati?',
+    reset_done: 'Tutti i dati sono stati eliminati.',
+    note: 'Note', low_stock: 'Scorta bassa',
+    fields_info: 'I campi predefiniti non possono essere rimossi. Puoi aggiungere campi custom.',
+    new_field_placeholder: 'Nome nuovo campo…',
+    field_type_text: 'Testo', field_type_number: 'Numero', field_type_textarea: 'Nota lunga',
+    cookie_title: 'Cookie & Privacy',
+    cookie_text: 'Questa app utilizza localStorage per salvare i tuoi dati localmente sul dispositivo. Nessun dato viene inviato a server esterni.',
+    cookie_accept: 'Accetto', cookie_privacy: 'Leggi la Privacy Policy',
+    partner_title: 'Partner & Sponsor',
+    partner_banner: 'Gestisci i tuoi contatti: negozi, associazioni e maestri di pesca',
+    tab_negozi: 'Negozi di pesca', tab_associazioni: 'Associazioni', tab_maestri: 'Maestri di pesca',
+    add_negozio: '+ Aggiungi negozio', add_associazione: '+ Aggiungi associazione', add_maestro: '+ Aggiungi maestro',
+    privacy_title: 'Privacy Policy',
+    export_btn: 'Esporta archivio', import_btn: 'Importa archivio', reset_btn: 'Reset completo',
+    lang_btn: 'Lingua', sections_label: 'Sezioni:',
+  },
+  EN: {
+    section_travi: 'Rigs', section_terminali: 'Leaders', section_piombi: 'Sinkers',
+    section_fili: 'Lines', section_ami: 'Hooks', section_shock: 'Shock Leaders',
+    section_mulinelli: 'Reels', section_bobbine: 'Spools', section_canne: 'Rods',
+    section_accessori: 'Accessories',
+    add: '+ Add', fields: '⚙ Fields',
+    add_title: 'Add item', edit_title: 'Edit',
+    save: 'Save', cancel: 'Cancel', close: 'Close', delete_confirm: 'Delete this item?',
+    expand_all: '⊞ Expand all', collapse_all: '⊟ Collapse all',
+    search_placeholder: 'Search the entire archive…',
+    empty_msg: 'No items. Use "+ Add" to start.',
+    saved: 'Saved ✓', save_error: 'Error saving!',
+    exported: 'Archive exported ✓', imported: 'Imported ✓',
+    import_error: 'Invalid file.', reset_confirm: 'Delete ALL data?',
+    reset_done: 'All data has been deleted.',
+    note: 'Notes', low_stock: 'Low stock',
+    fields_info: 'Default fields cannot be removed. You can add custom fields.',
+    new_field_placeholder: 'New field name…',
+    field_type_text: 'Text', field_type_number: 'Number', field_type_textarea: 'Long note',
+    cookie_title: 'Cookie & Privacy',
+    cookie_text: 'This app uses localStorage to save your data locally on the device. No data is sent to external servers.',
+    cookie_accept: 'Accept', cookie_privacy: 'Read Privacy Policy',
+    partner_title: 'Partners & Sponsors',
+    partner_banner: 'Manage your contacts: shops, associations and fishing masters',
+    tab_negozi: 'Fishing shops', tab_associazioni: 'Associations', tab_maestri: 'Fishing masters',
+    add_negozio: '+ Add shop', add_associazione: '+ Add association', add_maestro: '+ Add master',
+    privacy_title: 'Privacy Policy',
+    export_btn: 'Export archive', import_btn: 'Import archive', reset_btn: 'Full reset',
+    lang_btn: 'Language', sections_label: 'Sections:',
+  },
+  ES: {
+    section_travi: 'Aparejos', section_terminali: 'Terminales', section_piombi: 'Plomos',
+    section_fili: 'Hilos', section_ami: 'Anzuelos', section_shock: 'Shock Leaders',
+    section_mulinelli: 'Carretes', section_bobbine: 'Bobinas', section_canne: 'Cañas',
+    section_accessori: 'Accesorios',
+    add: '+ Añadir', fields: '⚙ Campos',
+    add_title: 'Añadir elemento', edit_title: 'Editar',
+    save: 'Guardar', cancel: 'Cancelar', close: 'Cerrar', delete_confirm: '¿Eliminar este elemento?',
+    expand_all: '⊞ Expandir todo', collapse_all: '⊟ Colapsar todo',
+    search_placeholder: 'Buscar en todo el archivo…',
+    empty_msg: 'Sin elementos. Usa "+ Añadir" para empezar.',
+    saved: 'Guardado ✓', save_error: '¡Error al guardar!',
+    exported: 'Archivo exportado ✓', imported: 'Importado ✓',
+    import_error: 'Archivo no válido.', reset_confirm: '¿Eliminar TODOS los datos?',
+    reset_done: 'Todos los datos han sido eliminados.',
+    note: 'Notas', low_stock: 'Stock bajo',
+    fields_info: 'Los campos predeterminados no se pueden eliminar. Puedes añadir campos personalizados.',
+    new_field_placeholder: 'Nombre del nuevo campo…',
+    field_type_text: 'Texto', field_type_number: 'Número', field_type_textarea: 'Nota larga',
+    cookie_title: 'Cookie y Privacidad',
+    cookie_text: 'Esta app usa localStorage para guardar tus datos localmente. Ningún dato se envía a servidores externos.',
+    cookie_accept: 'Acepto', cookie_privacy: 'Leer Política de Privacidad',
+    partner_title: 'Socios y Patrocinadores',
+    partner_banner: 'Gestiona tus contactos: tiendas, asociaciones y maestros de pesca',
+    tab_negozi: 'Tiendas de pesca', tab_associazioni: 'Asociaciones', tab_maestri: 'Maestros de pesca',
+    add_negozio: '+ Añadir tienda', add_associazione: '+ Añadir asociación', add_maestro: '+ Añadir maestro',
+    privacy_title: 'Política de Privacidad',
+    export_btn: 'Exportar archivo', import_btn: 'Importar archivo', reset_btn: 'Reset completo',
+    lang_btn: 'Idioma', sections_label: 'Secciones:',
+  },
+  FR: {
+    section_travi: 'Montages', section_terminali: 'Bas de ligne', section_piombi: 'Plombs',
+    section_fili: 'Fils', section_ami: 'Hameçons', section_shock: 'Shock Leaders',
+    section_mulinelli: 'Moulinets', section_bobbine: 'Bobines', section_canne: 'Cannes',
+    section_accessori: 'Accessoires',
+    add: '+ Ajouter', fields: '⚙ Champs',
+    add_title: 'Ajouter un élément', edit_title: 'Modifier',
+    save: 'Enregistrer', cancel: 'Annuler', close: 'Fermer', delete_confirm: 'Supprimer cet élément ?',
+    expand_all: '⊞ Tout déplier', collapse_all: '⊟ Tout replier',
+    search_placeholder: 'Rechercher dans toute l\'archive…',
+    empty_msg: 'Aucun élément. Utilisez "+ Ajouter" pour commencer.',
+    saved: 'Enregistré ✓', save_error: 'Erreur de sauvegarde !',
+    exported: 'Archive exportée ✓', imported: 'Importé ✓',
+    import_error: 'Fichier invalide.', reset_confirm: 'Supprimer TOUTES les données ?',
+    reset_done: 'Toutes les données ont été supprimées.',
+    note: 'Notes', low_stock: 'Stock bas',
+    fields_info: 'Les champs par défaut ne peuvent pas être supprimés. Vous pouvez ajouter des champs personnalisés.',
+    new_field_placeholder: 'Nom du nouveau champ…',
+    field_type_text: 'Texte', field_type_number: 'Nombre', field_type_textarea: 'Note longue',
+    cookie_title: 'Cookies et Confidentialité',
+    cookie_text: 'Cette app utilise localStorage pour sauvegarder vos données localement. Aucune donnée n\'est envoyée à des serveurs externes.',
+    cookie_accept: 'J\'accepte', cookie_privacy: 'Lire la Politique de Confidentialité',
+    partner_title: 'Partenaires et Sponsors',
+    partner_banner: 'Gérez vos contacts : magasins, associations et maîtres de pêche',
+    tab_negozi: 'Magasins de pêche', tab_associazioni: 'Associations', tab_maestri: 'Maîtres de pêche',
+    add_negozio: '+ Ajouter magasin', add_associazione: '+ Ajouter association', add_maestro: '+ Ajouter maître',
+    privacy_title: 'Politique de Confidentialité',
+    export_btn: 'Exporter archive', import_btn: 'Importer archive', reset_btn: 'Réinitialisation complète',
+    lang_btn: 'Langue', sections_label: 'Sections :',
+  }
+};
+
+const LANGS = ['IT','EN','ES','FR'];
+let _lang = localStorage.getItem('surfcasting_lang') || 'IT';
+
+function t(key) {
+  return (TRANSLATIONS[_lang] && TRANSLATIONS[_lang][key]) || (TRANSLATIONS.IT[key]) || key;
+}
+
+function cycleLang() {
+  const idx = LANGS.indexOf(_lang);
+  _lang = LANGS[(idx + 1) % LANGS.length];
+  localStorage.setItem('surfcasting_lang', _lang);
+  const label = document.getElementById('langLabel');
+  if (label) label.textContent = _lang;
+  renderAll();
+  updateStaticTexts();
+  showToast(_lang, 'success');
+}
+
+function updateStaticTexts() {
+  // Search placeholder
+  const search = document.getElementById('globalSearch');
+  if (search) search.placeholder = t('search_placeholder');
+  // Toolbar buttons
+  const toolbar = document.querySelector('.toolbar');
+  if (toolbar) {
+    const title = toolbar.querySelector('.toolbar-title');
+    if (title) title.textContent = t('sections_label');
+    const btns = toolbar.querySelectorAll('.btn');
+    if (btns[0]) btns[0].textContent = t('expand_all');
+    if (btns[1]) btns[1].textContent = t('collapse_all');
+  }
+  // Lang label
+  const label = document.getElementById('langLabel');
+  if (label) label.textContent = _lang;
+  // Cookie banner
+  const cb = document.getElementById('cookieBanner');
+  if (cb && cb.style.display !== 'none') {
+    const ps = cb.querySelectorAll('p');
+    if (ps[0]) ps[0].innerHTML = '<strong>' + t('cookie_title') + '</strong>';
+    if (ps[1]) ps[1].textContent = t('cookie_text');
+    const btns = cb.querySelectorAll('button');
+    if (btns[0]) btns[0].textContent = t('cookie_accept');
+    if (btns[1]) btns[1].textContent = t('cookie_privacy');
+  }
+}
+
+// ─────────────────────────────────────────────
+//  COOKIE BANNER
+// ─────────────────────────────────────────────
+function initCookieBanner() {
+  if (!localStorage.getItem('surfcasting_cookie_consent')) {
+    document.getElementById('cookieBanner').style.display = 'block';
+  }
+}
+function acceptCookies() {
+  localStorage.setItem('surfcasting_cookie_consent', Date.now());
+  document.getElementById('cookieBanner').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────
+//  PRIVACY MODAL
+// ─────────────────────────────────────────────
+function openPrivacyModal() {
+  document.getElementById('privacyModal').style.display = 'flex';
+}
+function closePrivacyModal(event) {
+  if (event && event.target !== document.getElementById('privacyModal')) return;
+  document.getElementById('privacyModal').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────────────
 loadData();
 renderAll();
+updateStaticTexts();
+initCookieBanner();
 </script>
 </body>
 </html>
