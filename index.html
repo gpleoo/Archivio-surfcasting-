@@ -69,7 +69,9 @@
     }
     button { font-family: inherit; cursor: pointer; border: none; outline: none; transition: all var(--transition); }
     button:active { transform: scale(.97); }
-    input, select, textarea { font-family: inherit; font-size: .95rem; }
+    input, select, textarea { font-family: inherit; font-size: 1rem; }
+    input, select { min-height: 44px; padding: .5rem .75rem; }
+    textarea { padding: .5rem .75rem; }
     a { color: var(--accent); text-decoration: none; }
 
     /* ── NAVBAR ── */
@@ -492,9 +494,23 @@
     .partner-icon-circle.maestri { background: rgba(240,180,41,.15); }
     .partner-entry { display: flex; align-items: center; }
 
+    /* ── LANG SELECTOR ── */
+    .lang-options {
+      display: flex; flex-wrap: wrap; gap: .4rem;
+      padding: .4rem .25rem .2rem;
+    }
+    .lang-opt {
+      flex: 1; min-width: 45%; padding: .65rem .5rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); cursor: pointer; font-size: .95rem;
+      text-align: center; color: var(--text); transition: all .15s;
+    }
+    .lang-opt:hover { border-color: var(--accent); background: var(--accent-glow); }
+    .lang-opt.active { border-color: var(--accent); background: var(--accent-glow); font-weight: 600; }
+
     /* ── PHABLET (≤ 680px) ── */
     @media (max-width: 680px) {
-      html { font-size: 15px; }
+      html { font-size: 16px; }
       .form-grid { grid-template-columns: 1fr; }
       .partner-form-grid { grid-template-columns: 1fr; }
       .navbar {
@@ -502,11 +518,12 @@
         gap: .6rem;
       }
       .navbar-search { min-width: 0; }
-      .section-header { padding: .85rem 1rem; }
+      .section-header { padding: .95rem 1rem; }
       .section-header-actions .btn span.btn-label { display: none; }
-      .section-body-inner { padding: .2rem .85rem 1rem; }
-      .section-icon { font-size: 1.3rem; }
-      .section-title { font-size: 1rem; }
+      .section-body-inner { padding: .3rem .9rem 1rem; }
+      .section-icon { font-size: 1.4rem; }
+      .section-title { font-size: 1.15rem; }
+      .section-badge { font-size: .95rem; }
       .gear-dropdown {
         min-width: 230px;
         top: auto;
@@ -521,7 +538,7 @@
 
     /* ── MOBILE (≤ 480px): card-view tabelle ── */
     @media (max-width: 480px) {
-      html { font-size: 14px; }
+      html { font-size: 16px; }
       .navbar {
         padding-left:  max(.9rem, env(safe-area-inset-left));
         padding-right: max(.9rem, env(safe-area-inset-right));
@@ -531,24 +548,33 @@
       .mobile-card-list { display: block; }
       /* Sezione header: nascondi testi bottoni */
       .section-header-actions .btn { padding: .4rem .55rem; font-size: 0; gap: 0; }
-      .section-header-actions .btn::before { font-size: .85rem; }
-      .btn-add-item::before  { content: '+'; font-size: 1rem; font-weight: 800; }
-      .btn-open-fields::before { content: '⚙'; font-size: .95rem; }
+      .section-header-actions .btn::before { font-size: 1rem; }
+      .btn-add-item::before  { content: '+'; font-size: 1.15rem; font-weight: 800; }
+      .btn-open-fields::before { content: '⚙'; font-size: 1.05rem; }
       /* Main padding */
       .main { padding: 1rem .75rem max(3rem, calc(1rem + env(safe-area-inset-bottom))); }
-      .section-body-inner { padding: .15rem .65rem .9rem; }
+      .section-body-inner { padding: .25rem .85rem 1rem; }
       .toolbar { gap: .4rem; margin-bottom: 1rem; }
       .toolbar-title { display: none; }
+      /* Mobile card leggibilità */
+      .mobile-card { padding: 1rem; }
+      .mobile-card-key { font-size: .9rem; }
+      .mobile-card-val { font-size: 1rem; }
+      .mobile-card-actions .btn { font-size: .95rem; }
+      /* Form e modali */
       .modal { margin: .5rem; max-height: calc(100dvh - 1rem); border-radius: var(--radius); }
-      .modal-body { padding: 1rem 1.1rem; }
-      .modal-header, .modal-footer { padding: .85rem 1.1rem; }
+      .modal-body { padding: 1.1rem 1.2rem; }
+      .modal-header, .modal-footer { padding: .95rem 1.2rem; }
       .modal-footer { gap: .5rem; }
-      .modal-footer .btn { flex: 1; justify-content: center; min-height: 44px; }
+      .modal-footer .btn { flex: 1; justify-content: center; min-height: 48px; font-size: 1rem; }
+      .form-group label { font-size: .95rem; margin-bottom: .35rem; }
+      input, select { min-height: 48px; font-size: 1rem; }
+      textarea { font-size: 1rem; }
     }
 
     /* ── SMALL PHONE (≤ 360px) ── */
     @media (max-width: 360px) {
-      html { font-size: 13px; }
+      html { font-size: 15px; }
       .navbar-brand span.logo { font-size: 1.3rem; }
       .navbar-brand { font-size: 1rem; }
     }
@@ -611,7 +637,13 @@
   <div class="gear-dropdown-title" style="margin-top:.25rem">Impostazioni</div>
   <div class="gear-dropdown-actions">
     <button class="btn btn-ghost" onclick="openPrivacyModal();toggleSettingsPanel()">🔒&nbsp; Privacy Policy</button>
-    <button class="btn btn-ghost" onclick="cycleLang()">🌐&nbsp; Lingua: <span id="langLabel">IT</span></button>
+    <button class="btn btn-ghost lang-toggle" onclick="toggleLangPanel()">🌐&nbsp; <span id="langLabelBtn">Lingua: IT</span> ▾</button>
+    <div class="lang-options" id="langOptions" style="display:none">
+      <button class="lang-opt" data-lang="IT" onclick="setLang('IT')">🇮🇹 Italiano</button>
+      <button class="lang-opt" data-lang="EN" onclick="setLang('EN')">🇬🇧 English</button>
+      <button class="lang-opt" data-lang="ES" onclick="setLang('ES')">🇪🇸 Español</button>
+      <button class="lang-opt" data-lang="FR" onclick="setLang('FR')">🇫🇷 Français</button>
+    </div>
   </div>
   <div class="gear-dropdown-title" style="margin-top:.25rem">Dati</div>
   <div class="gear-dropdown-actions">
@@ -1721,15 +1753,30 @@ function t(key) {
   return (TRANSLATIONS[_lang] && TRANSLATIONS[_lang][key]) || (TRANSLATIONS.IT[key]) || key;
 }
 
-function cycleLang() {
-  const idx = LANGS.indexOf(_lang);
-  _lang = LANGS[(idx + 1) % LANGS.length];
+const LANG_FLAGS = { IT: '🇮🇹', EN: '🇬🇧', ES: '🇪🇸', FR: '🇫🇷' };
+const LANG_NAMES = { IT: 'Italiano', EN: 'English', ES: 'Español', FR: 'Français' };
+
+function toggleLangPanel() {
+  const opts = document.getElementById('langOptions');
+  if (!opts) return;
+  const isOpen = opts.style.display === 'none';
+  opts.style.display = isOpen ? 'flex' : 'none';
+  highlightActiveLang();
+}
+
+function setLang(lang) {
+  _lang = lang;
   localStorage.setItem('surfcasting_lang', _lang);
-  const label = document.getElementById('langLabel');
-  if (label) label.textContent = _lang;
+  document.getElementById('langOptions').style.display = 'none';
   renderAll();
   updateStaticTexts();
-  showToast(_lang, 'success');
+  showToast(LANG_FLAGS[_lang] + ' ' + LANG_NAMES[_lang], 'success');
+}
+
+function highlightActiveLang() {
+  document.querySelectorAll('.lang-opt').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === _lang);
+  });
 }
 
 function updateStaticTexts() {
@@ -1745,9 +1792,10 @@ function updateStaticTexts() {
     if (btns[0]) btns[0].textContent = t('expand_all');
     if (btns[1]) btns[1].textContent = t('collapse_all');
   }
-  // Lang label
-  const label = document.getElementById('langLabel');
-  if (label) label.textContent = _lang;
+  // Lang label nel dropdown
+  const langBtn = document.getElementById('langLabelBtn');
+  if (langBtn) langBtn.textContent = t('lang_btn') + ': ' + LANG_FLAGS[_lang] + ' ' + _lang;
+  highlightActiveLang();
   // Cookie banner
   const cb = document.getElementById('cookieBanner');
   if (cb && cb.style.display !== 'none') {
