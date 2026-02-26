@@ -2,7 +2,7 @@
   "name": "Archivio Surfcasting",
   "short_name": "Surfcasting",
   "description": "Gestisci e archivia tutto il tuo materiale da surfcasting: travi, terminali, piombi, fili, canne, mulinelli e molto altro.",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0b0f14",
@@ -72,14 +72,14 @@
       "name": "Travi",
       "short_name": "Travi",
       "description": "Vai alla sezione Travi",
-      "url": "/index.html#travi",
+      "url": "./index.html#travi",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
     },
     {
       "name": "Terminali",
       "short_name": "Terminali",
       "description": "Vai alla sezione Terminali",
-      "url": "/index.html#terminali",
+      "url": "./index.html#terminali",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
     }
   ]
